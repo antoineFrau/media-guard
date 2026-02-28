@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "MediaGuard",
+  "version": "1.0.0",
+  "description": "Video analysis and fact-check overlays for YouTube",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "mediaguard@example.com",
+      "strict_min_version": "109.0"
+    }
+  },
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "*://www.youtube.com/*"
+  ],
+  "background": {
+    "scripts": ["background/service-worker.js"],
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/watch*"],
+      "js": ["lib/youtube.js", "content/content.js"],
+      "css": ["content/overlay.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html"
+  }
+}

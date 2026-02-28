@@ -1,0 +1,244 @@
+/* MediaGuard overlay styles */
+
+#mediaguard-overlay-root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+#mediaguard-overlay-root * {
+  pointer-events: auto;
+}
+
+.mediaguard-placeholder {
+  position: absolute;
+  bottom: 48px;
+  left: 12px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  font-size: 13px;
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.mediaguard-placeholder.mediaguard-error {
+  background: rgba(185, 28, 28, 0.9);
+}
+
+.mediaguard-placeholder a.mediaguard-retry {
+  color: #93c5fd;
+  text-decoration: underline;
+  margin-left: 4px;
+}
+
+.mediaguard-placeholder a.mediaguard-retry:hover {
+  color: #bfdbfe;
+}
+
+.mediaguard-segment-markers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  display: flex;
+}
+
+.mediaguard-segment-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  opacity: 0.6;
+  border-radius: 1px;
+}
+
+.mediaguard-segment-bar.mediaguard-manipulation {
+  background: #ea580c;
+}
+
+.mediaguard-segment-bar.mediaguard-fact-check {
+  background: #2563eb;
+}
+
+.mediaguard-floating-panel {
+  position: absolute;
+  bottom: 56px;
+  left: 12px;
+  max-width: 360px;
+  padding: 12px;
+  background: rgba(17, 24, 39, 0.95);
+  color: #f3f4f6;
+  font-size: 13px;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: opacity 0.2s ease;
+}
+
+.mediaguard-floating-panel.mediaguard-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mediaguard-panel-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.mediaguard-panel-type {
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.mediaguard-panel-type.manipulation {
+  color: #fdba74;
+}
+
+.mediaguard-panel-type.fact-check {
+  color: #93c5fd;
+}
+
+.mediaguard-panel-severity,
+.mediaguard-panel-verdict {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.mediaguard-panel-severity.low { background: rgba(34, 197, 94, 0.3); }
+.mediaguard-panel-severity.medium { background: rgba(234, 179, 8, 0.3); }
+.mediaguard-panel-severity.high { background: rgba(239, 68, 68, 0.3); }
+
+.mediaguard-panel-verdict.misleading,
+.mediaguard-panel-verdict.false { background: rgba(239, 68, 68, 0.3); }
+.mediaguard-panel-verdict.true,
+.mediaguard-panel-verdict.verified { background: rgba(34, 197, 94, 0.3); }
+
+.mediaguard-panel-technique,
+.mediaguard-panel-claim {
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.mediaguard-panel-quote {
+  margin: 6px 0;
+  padding: 6px 0 6px 10px;
+  border-left: 3px solid #6b7280;
+  font-style: italic;
+  color: #d1d5db;
+}
+
+.mediaguard-panel-explanation,
+.mediaguard-panel-context {
+  color: #d1d5db;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.mediaguard-panel-sources {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.mediaguard-panel-sources ul {
+  margin: 4px 0 0 0;
+  padding-left: 18px;
+}
+
+.mediaguard-panel-sources a {
+  color: #60a5fa;
+}
+
+.mediaguard-comment-btn {
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 12px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.mediaguard-comment-btn:hover {
+  background: #2563eb;
+}
+
+/* Modal */
+.mediaguard-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mediaguard-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.mediaguard-modal-content {
+  position: relative;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.mediaguard-modal-content h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+}
+
+.mediaguard-modal-content textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.mediaguard-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.mediaguard-modal-cancel,
+.mediaguard-modal-submit {
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.mediaguard-modal-cancel {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+}
+
+.mediaguard-modal-submit {
+  background: #3b82f6;
+  color: white;
+  border: none;
+}

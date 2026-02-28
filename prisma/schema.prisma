@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model VideoAnalysis {
+  id             String   @id @default(uuid())
+  videoId        String   @unique
+  transcriptHash String?
+  alerts         Json     @default("[]")
+  factChecks      Json     @default("[]")
+  createdAt      DateTime @default(now())
+}
+
+model Annotation {
+  id            String   @id @default(uuid())
+  videoId       String
+  timestampStart Float
+  timestampEnd   Float
+  type          AnnotationType
+  content       String
+  explanation   String?
+  sources       Json     @default("[]")
+  userComments  Json     @default("[]")
+  version       Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  comments AnnotationComment[]
+
+  @@index([videoId])
+}
+
+enum AnnotationType {
+  MANIPULATION
+  FACT_CHECK
+}
+
+model AnnotationComment {
+  id                    String   @id @default(uuid())
+  annotationId          String
+  userContent           String
+  mistralImprovedContent Json?
+  status                AnnotationCommentStatus @default(PENDING)
+  createdAt             DateTime @default(now())
+
+  annotation Annotation @relation(fields: [annotationId], references: [id], onDelete: Cascade)
+
+  @@index([annotationId])
+}
+
+enum AnnotationCommentStatus {
+  PENDING
+  APPLIED
+  REJECTED
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup">
+    <h1>MediaGuard</h1>
+    <p class="subtitle">Video analysis overlays for YouTube</p>
+
+    <div class="field">
+      <label for="mistral-key">Mistral API Key (BYOK)</label>
+      <input type="password" id="mistral-key" placeholder="Enter your Mistral API key">
+      <span class="hint">Required for analysis. Never stored on our servers.</span>
+    </div>
+
+    <div class="field">
+      <label for="api-url">API Base URL</label>
+      <input type="url" id="api-url" placeholder="https://your-worker.workers.dev">
+      <span class="hint">Optional. Default: MediaGuard API.</span>
+    </div>
+
+    <button id="save-btn">Save</button>
+    <span id="status" class="status"></span>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

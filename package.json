@@ -1,0 +1,26 @@
+{
+  "name": "media-guard",
+  "private": true,
+  "type": "module",
+  "workspaces": ["api", "scripts/skill-generator"],
+  "scripts": {
+    "db:start": "docker compose up -d",
+    "db:stop": "docker compose down",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "api:dev": "npm run --workspace=media-guard-api dev",
+    "skill:generate": "npm run generate --workspace=skill-generator"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "devDependencies": {
+    "prisma": "^6.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.0.0"
+  }
+}
