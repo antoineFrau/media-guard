@@ -72,4 +72,28 @@ npm run generate       # Default: last 10 videos
 npm run generate -- --last=5   # Custom count
 ```
 
+From project root:
+
+```bash
+npm run skill:generate -- --last=5
+npm run skill:generate -- --fetch-only --last=2   # Test YouTube fetch without Mistral
+```
+
 **Environment:** `MISTRAL_API_KEY` (required), `S2_API_KEY` (optional, for higher Semantic Scholar rate limits)
+
+**Troubleshooting:**
+- If "No videos found on channel", set `MEDIAGUARD_VIDEO_IDS=id1,id2,id3` to use specific video IDs (bypasses channel fetch).
+- Transcripts use the internal `get_transcript` API (from [mcp-server-youtube-transcript](https://github.com/kimtaeyoon83/mcp-server-youtube-transcript)) — more reliable than youtubei.js for captions.
+
+## STT App (Version 1 – offline transcription)
+
+Standalone web app for offline speech-to-text using [Kyutai STT](https://github.com/lucky-bai/wasm-speech-streaming) (WASM). Captures mic or tab audio, transcribes in real time, then sends to MediaGuard API for analysis.
+
+**Prerequisites:** Rust, `wasm32-unknown-unknown`, `wasm-bindgen-cli` (see [wasm-speech-streaming](https://github.com/lucky-bai/wasm-speech-streaming#prerequisites)).
+
+```bash
+npm run stt:build    # Build WASM (one-time, requires Rust)
+npm run stt:serve    # Serve at http://localhost:8000
+```
+
+Open http://localhost:8000. Choose Mic or Tab audio, start transcription, then click **Analyze with MediaGuard** to detect manipulation techniques. Requires Mistral API key and API running at http://localhost:3000.

@@ -2,7 +2,10 @@
   "name": "media-guard",
   "private": true,
   "type": "module",
-  "workspaces": ["api", "scripts/skill-generator"],
+  "workspaces": [
+    "api",
+    "scripts/skill-generator"
+  ],
   "scripts": {
     "db:start": "docker compose up -d",
     "db:stop": "docker compose down",
@@ -10,7 +13,11 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "api:dev": "npm run --workspace=media-guard-api dev",
-    "skill:generate": "npm run generate --workspace=skill-generator"
+    "skill:generate": "cd scripts/skill-generator && tsx src/index.ts",
+    "stt:build": "./scripts/build-stt.sh",
+    "stt:serve": "python scripts/serve-stt.py",
+    "skill:generate:datasets": "cd scripts/skill-generator && tsx src/generate-from-datasets.ts",
+    "skill:evaluate": "cd scripts/skill-generator && tsx src/evaluate.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

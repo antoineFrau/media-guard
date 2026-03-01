@@ -4,3 +4,10 @@ dist/
 !.env.example
 *.log
 .DS_Store
+
+# WASM build output (large binaries)
+libs/wasm-speech-streaming/build/
+stt-app/build
+
+# Skill generator Python venv
+scripts/skill-generator/.venv/

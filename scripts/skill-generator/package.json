@@ -4,11 +4,16 @@
   "type": "module",
   "scripts": {
     "generate": "tsx src/index.ts",
+    "generate:fetch-only": "tsx src/index.ts --fetch-only",
+    "generate:datasets": "tsx src/generate-from-datasets.ts",
+    "definitions": "tsx src/run-definitions.ts",
+    "evaluate": "tsx src/evaluate.ts",
     "build": "tsc"
   },
   "dependencies": {
     "@mistralai/mistralai": "^1.8.0",
-    "youtubei.js": "^10.0.0",
+    "dotenv": "^16.6.1",
+    "youtubei.js": "^16.0.1",
     "zod": "^3.23.0"
   },
   "devDependencies": {

@@ -1,13 +1,14 @@
 const storage = typeof browser !== 'undefined' ? browser.storage : chrome.storage;
 const runtime = typeof browser !== 'undefined' ? browser.runtime : chrome.runtime;
-const STORAGE_KEYS = { mistralKey: 'mistral_api_key', apiBaseUrl: 'api_base_url' };
-const DEFAULT_API_URL = 'https://media-guard-api.example.workers.dev';
+const STORAGE_KEYS = { mistralKey: 'mistral_api_key', apiBaseUrl: 'api_base_url', elevenlabsKey: 'elevenlabs_api_key' };
+const DEFAULT_API_URL = 'http://localhost:3000';
 
 async function getApiConfig() {
-  const data = await storage.local.get([STORAGE_KEYS.mistralKey, STORAGE_KEYS.apiBaseUrl]);
+  const data = await storage.local.get([STORAGE_KEYS.mistralKey, STORAGE_KEYS.apiBaseUrl, STORAGE_KEYS.elevenlabsKey]);
   return {
     mistralKey: data[STORAGE_KEYS.mistralKey] || '',
-    apiBaseUrl: (data[STORAGE_KEYS.apiBaseUrl] || '').replace(/\/$/, '') || DEFAULT_API_URL
+    apiBaseUrl: (data[STORAGE_KEYS.apiBaseUrl] || '').replace(/\/$/, '') || DEFAULT_API_URL,
+    elevenlabsKey: data[STORAGE_KEYS.elevenlabsKey] || ''
   };
 }
 
@@ -32,19 +33,27 @@ async function handleMessage(message) {
   switch (action) {
     case 'getAnalysis': {
       const { videoId } = message;
-      if (!videoId) return { error: 'Missing videoId' };
+      if (!videoId) {
+        console.log('[MediaGuard ext] getAnalysis: missing videoId');
+        return { error: 'Missing videoId' };
+      }
       const url = `${apiBaseUrl}/video/${videoId}/analysis`;
+      console.log('[MediaGuard ext] getAnalysis:', videoId, '->', url);
       const res = await fetchWithConfig(url);
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
+        console.log('[MediaGuard ext] getAnalysis error:', res.status, body);
         return { error: body.reason || `HTTP ${res.status}`, status: res.status };
       }
-      return await res.json();
+      const data = await res.json();
+      console.log('[MediaGuard ext] getAnalysis OK:', videoId, 'alerts:', data.alerts?.length, 'fact_checks:', data.fact_checks?.length);
+      return data;
     }
     case 'getAnnotations': {
       const { videoId } = message;
       if (!videoId) return { error: 'Missing videoId' };
       const url = `${apiBaseUrl}/annotations/${videoId}`;
+      console.log('[MediaGuard ext] getAnnotations:', videoId);
       const res = await fetchWithConfig(url);
       if (!res.ok) return { error: `HTTP ${res.status}`, status: res.status };
       return await res.json();

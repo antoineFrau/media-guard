@@ -11,12 +11,14 @@ datasource db {
 }
 
 model VideoAnalysis {
-  id             String   @id @default(uuid())
-  videoId        String   @unique
-  transcriptHash String?
-  alerts         Json     @default("[]")
+  id              String   @id @default(uuid())
+  videoId         String   @unique
+  transcriptHash  String?
+  transcript      Json?    // Full transcript segments [{ text, start, end }] - from ElevenLabs or YouTube
+  transcriptSource String?  // "elevenlabs" | "youtube" - where the transcript originated
+  alerts          Json     @default("[]")
   factChecks      Json     @default("[]")
-  createdAt      DateTime @default(now())
+  createdAt       DateTime @default(now())
 }
 
 model Annotation {

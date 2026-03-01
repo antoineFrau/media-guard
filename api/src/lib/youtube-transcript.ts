@@ -67,6 +67,7 @@ export async function fetchTranscript(
   const captionTracks =
     playerData?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
   if (!captionTracks?.length) {
+    console.log(`[MediaGuard API] YouTube: no caption tracks for ${videoId}`);
     return null;
   }
 
@@ -110,5 +111,9 @@ export async function fetchTranscript(
     segments.push({ text, start, end });
   }
 
-  return segments.length > 0 ? segments : null;
+  if (segments.length === 0) {
+    console.log(`[MediaGuard API] YouTube: no segments in captions for ${videoId}`);
+    return null;
+  }
+  return segments;
 }

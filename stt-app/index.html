@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediaGuard STT – Offline transcription + analysis</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; margin: 0; padding: 1.5rem; max-width: 48rem; margin-inline: auto; }
+    h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
+    p { color: #444; margin: 0 0 1rem; font-size: 0.9rem; }
+    .controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+    button { padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; cursor: pointer; border: none; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-primary { background: #1a1a2e; color: white; }
+    .btn-primary:hover:not(:disabled) { background: #16213e; }
+    .btn-stop { background: #c53030; color: white; }
+    .btn-stop:hover:not(:disabled) { background: #9b2c2c; }
+    .btn-analyze { background: #2d5a27; color: white; }
+    .btn-analyze:hover:not(:disabled) { background: #234b1f; }
+    .btn-secondary { background: #e2e8f0; color: #1e293b; }
+    .btn-secondary:hover:not(:disabled) { background: #cbd5e1; }
+    .status { font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem; }
+    .transcript { min-height: 120px; padding: 1rem; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.5; }
+    .transcript:empty::before { content: "Transcription will appear here…"; color: #94a3b8; }
+    .config { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; font-size: 0.85rem; }
+    .config label { display: flex; flex-direction: column; gap: 0.25rem; }
+    .config input { padding: 0.4rem; border: 1px solid #cbd5e1; border-radius: 4px; width: 14rem; }
+    .segments { margin-top: 1rem; }
+    .segment { padding: 0.75rem; border-radius: 8px; margin-bottom: 0.5rem; border-left: 4px solid; }
+    .segment.manipulation { background: #fef2f2; border-color: #dc2626; }
+    .segment.fact-check { background: #eff6ff; border-color: #2563eb; }
+    .segment-header { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; }
+    .segment-quote { font-style: italic; margin: 0.25rem 0; }
+    .segment-explanation { font-size: 0.85rem; color: #475569; }
+    .segment-time { font-size: 0.75rem; color: #94a3b8; }
+    .source-toggle, .provider-toggle { margin-right: 0.5rem; }
+    .diagnostics { margin: 1rem 0; padding: 1rem; background: #1e293b; color: #e2e8f0; border-radius: 8px; font-size: 12px; }
+    .diagnostics pre { margin: 0; white-space: pre-wrap; }
+    .diagnostics h3 { margin: 0 0 0.5rem; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>MediaGuard STT</h1>
+  <p><strong>The extension does NOT capture audio.</strong> Use this STT app: open it in one tab, have YouTube in another. Choose Tab + ElevenLabs, Start, then pick the YouTube tab when prompted. <em>Check "Share tab audio"</em> in the picker.</p>
+
+  <div class="config">
+    <label>API URL <input id="api-url" type="url" placeholder="http://localhost:3000" /></label>
+    <label>Mistral API Key <input id="mistral-key" type="password" placeholder="Required for auto-analyze" /></label>
+    <label>ElevenLabs API Key <input id="elevenlabs-key" type="password" placeholder="Optional — uses server key if empty" /></label>
+    <label>Video ID (optional) <input id="video-id" type="text" placeholder="e.g. 7_LAiwqArvE for YouTube" title="Associate this transcript with a video for storage" /></label>
+  </div>
+
+  <div class="controls">
+    <span class="source-toggle">
+      <label><input type="radio" name="source" value="mic" checked /> Mic</label>
+      <label><input type="radio" name="source" value="tab" /> Tab audio</label>
+    </span>
+    <span class="provider-toggle">
+      <label><input type="radio" name="provider" value="local" checked /> Local (Moshi)</label>
+      <label><input type="radio" name="provider" value="elevenlabs" /> ElevenLabs (cloud)</label>
+    </span>
+    <button id="speech-btn" class="btn-primary">Start transcription</button>
+    <button id="analyze-btn" class="btn-analyze" disabled>Analyze with MediaGuard</button>
+  </div>
+
+  <div class="status" id="status">Choose ElevenLabs + Tab, start transcription. Audio streams to ElevenLabs; after 1 min, analysis is auto-sent to Mistral.</div>
+
+  <div id="diagnostics" class="diagnostics" hidden>
+    <h3>Diagnostics (validate audio flow)</h3>
+    <pre id="diagnostics-output"></pre>
+  </div>
+
+  <div class="transcript" id="transcript"></div>
+
+  <div id="segments-root" class="segments" hidden></div>
+
+  <script type="module" src="js/speech-recognition.js"></script>
+</body>
+</html>

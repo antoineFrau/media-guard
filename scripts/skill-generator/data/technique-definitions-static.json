@@ -1,0 +1,103 @@
+{
+  "techniques": [
+    {
+      "slug": "appeal-to-authority",
+      "name": "Appeal to Authority",
+      "nameFr": "Appel à l'autorité",
+      "definition": "Leveraging emotions by referencing authoritative figures or sources to persuade audiences. Using experts, institutions, or credible-seeming persons to lend weight to a claim.",
+      "example": "Monsignor Jean-François Lantheaume, who served as first Counsellor of the Nunciature in Washington, confirmed that \"Vigano said the truth. That's all.\""
+    },
+    {
+      "slug": "appeal-to-fear-prejudice",
+      "name": "Appeal to Fear/Prejudice",
+      "nameFr": "Appel à la peur / préjugé",
+      "definition": "Using fear, prejudice, or other strong emotions to influence the audience. Includes dramatic descriptions, catastrophic scenarios, or implicit threats.",
+      "example": "A dark, impenetrable and \"irreversible\" winter of persecution of the faithful by their own shepherds will fall."
+    },
+    {
+      "slug": "bandwagon-reductio-ad-hitlerum",
+      "name": "Bandwagon, Reductio ad Hitlerum",
+      "nameFr": "Effet de foule, Réductio ad Hitlerum",
+      "definition": "Bandwagon: Suggesting that everyone supports a position so the audience should too. Reductio ad Hitlerum: Comparing something to Hitler or Nazism to discredit it.",
+      "example": "\"Vichy journalism,\" a term which now fits so much of the mainstream media. It collaborates in the same way that the Vichy government in France collaborated with the Nazis."
+    },
+    {
+      "slug": "black-and-white-fallacy",
+      "name": "Black-and-White Fallacy",
+      "nameFr": "Fausse dichotomie",
+      "definition": "Presenting two alternatives as the only possibilities, when in fact more options exist. False dilemma or false binary.",
+      "example": "Francis said these words: \"Everyone is guilty for the good he could have done and did not do... If we do not oppose evil, we tacitly feed it.\""
+    },
+    {
+      "slug": "causal-oversimplification",
+      "name": "Causal Oversimplification",
+      "nameFr": "Fausse causalité",
+      "definition": "Reducing a complex cause-effect relationship to a single cause. Oversimplifying why something happened.",
+      "example": "If France had not have declared war on Germany then World War II would have never happened."
+    },
+    {
+      "slug": "doubt",
+      "name": "Doubt",
+      "nameFr": "Doute",
+      "definition": "Questioning or casting doubt on the credibility of a person, institution, or claim to undermine their position.",
+      "example": "Can the same be said for the Obama Administration?"
+    },
+    {
+      "slug": "exaggeration-minimisation",
+      "name": "Exaggeration/Minimisation",
+      "nameFr": "Exagération / Minimisation",
+      "definition": "Exaggerating the importance or severity of something, or minimising it. Downplaying harms or inflating threats.",
+      "example": "Coronavirus 'risk to the American people remains very low', Trump said."
+    },
+    {
+      "slug": "flag-waving",
+      "name": "Flag-Waving",
+      "nameFr": "Drapeau / nationalisme",
+      "definition": "Using patriotic or nationalistic symbols and appeals to evoke loyalty and emotional attachment.",
+      "example": "Mueller attempts to stop the will of We the People!!! It's time to jail Mueller."
+    },
+    {
+      "slug": "loaded-language",
+      "name": "Loaded Language",
+      "nameFr": "Langage chargé",
+      "definition": "Using words with strong emotional connotations to influence perception. Slanted vocabulary that triggers emotional responses.",
+      "example": "Outrage as Donald Trump suggests injecting disinfectant to kill virus."
+    },
+    {
+      "slug": "name-calling-labeling",
+      "name": "Name Calling/Labeling",
+      "nameFr": "Dénigrement / étiquetage",
+      "definition": "Using negative labels or epithets to describe a person or group. Attaching pejorative terms to discredit.",
+      "example": "WHO: Coronavirus emergency is 'Public Enemy Number 1'"
+    },
+    {
+      "slug": "repetition",
+      "name": "Repetition",
+      "nameFr": "Répétition",
+      "definition": "Repeating a message or phrase to reinforce it and make it seem more credible or important.",
+      "example": "I still have a dream. It is a dream deeply rooted in the American dream. I have a dream that..."
+    },
+    {
+      "slug": "slogans",
+      "name": "Slogans",
+      "nameFr": "Slogans",
+      "definition": "Short, memorable phrases designed to encapsulate a message and evoke emotional response. Catchy statements.",
+      "example": "\"BUILD THE WALL!\" Trump tweeted."
+    },
+    {
+      "slug": "thought-terminating-cliches",
+      "name": "Thought-terminating Cliches",
+      "nameFr": "Clichés terminateurs",
+      "definition": "Phrases that stop critical thinking. Short, stock phrases that discourage further examination.",
+      "example": "I do not really see any problems there. Marx is the President."
+    },
+    {
+      "slug": "whataboutism-straw-men-red-herring",
+      "name": "Whataboutism, Straw Men, Red Herring",
+      "nameFr": "Whataboutism, homme de paille, fausse piste",
+      "definition": "Whataboutism: Deflecting criticism by pointing to others' faults. Straw man: Misrepresenting an opponent's argument. Red herring: Introducing irrelevant information to distract.",
+      "example": "President Trump —who himself avoided national military service in the 1960's— keeps beating the war drums over North Korea."
+    }
+  ],
+  "source": "PRTA (ACL 2020), SemEval-2020 Task 11"
+}

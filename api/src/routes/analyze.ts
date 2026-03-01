@@ -52,11 +52,15 @@ analyzeRoutes.post("/", async (c) => {
       create: {
         videoId: video_id,
         transcriptHash: hash,
+        transcript: transcript as object,
+        transcriptSource: "elevenlabs",
         alerts: analysis.alerts,
         factChecks: analysis.fact_checks,
       },
       update: {
         transcriptHash: hash,
+        transcript: transcript as object,
+        transcriptSource: "elevenlabs",
         alerts: analysis.alerts,
         factChecks: analysis.fact_checks,
       },
@@ -94,6 +98,8 @@ analyzeRoutes.post("/", async (c) => {
 
   return c.json({
     video_id: video_id,
+    transcript_stored: true,
+    transcript_source: "elevenlabs",
     alerts: analysis.alerts,
     fact_checks: analysis.fact_checks,
   });

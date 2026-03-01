@@ -1,8 +1,19 @@
 import type { TranscriptSegment } from "./types.js";
-import { ANALYSIS_SYSTEM_PROMPT } from "../prompts/mistral-system.js";
+import { buildAnalysisSystemPrompt } from "../prompts/mistral-system.js";
+import { loadSkills, buildSkillsContext } from "./skills.js";
 
 const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
 const MODEL = "mistral-small-latest";
+
+let cachedSkillsContext: string | null = null;
+
+async function getSkillsContext(): Promise<string> {
+  if (cachedSkillsContext !== null) return cachedSkillsContext;
+  const skills = await loadSkills(undefined, 5);
+  cachedSkillsContext = buildSkillsContext(skills);
+  console.log(`[MediaGuard API] Loaded ${skills.length} skills for Mistral context`);
+  return cachedSkillsContext;
+}
 
 interface MistralMessage {
   role: "system" | "user" | "assistant";
@@ -43,11 +54,14 @@ export async function analyzeTranscript(
     .map((s) => `[${s.start.toFixed(1)}s-${s.end.toFixed(1)}s] ${s.text}`)
     .join("\n");
 
+  const skillsContext = await getSkillsContext();
+  const systemPrompt = buildAnalysisSystemPrompt(skillsContext);
+
   const messages: MistralMessage[] = [
-    { role: "system", content: ANALYSIS_SYSTEM_PROMPT },
+    { role: "system", content: systemPrompt },
     {
       role: "user",
-      content: `Analyze this video transcript:\n\n${transcriptText}`,
+      content: `Analyze this video transcript and identify any rhetorical manipulation or fact-checkable claims. Return valid JSON only.\n\n${transcriptText}`,
     },
   ];
 

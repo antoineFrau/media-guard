@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import "dotenv/config";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -9,28 +10,44 @@ import type { TechniqueWithSources, ProblemsDb } from "./types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, "..", "output");
+const TRANSCRIPTS_DIR = join(OUTPUT_DIR, "transcripts");
 const SKILLS_DIR = join(OUTPUT_DIR, "skills");
 const PROBLEMS_FILE = join(OUTPUT_DIR, "problems.json");
 
 async function main() {
   const args = process.argv.slice(2);
   const lastN = parseInt(args.find((a) => a.startsWith("--last="))?.split("=")[1] ?? "10", 10);
+  const fetchOnly = args.includes("--fetch-only");
+
+  if (fetchOnly) {
+    console.log("Fetch-only mode: testing YouTube fetch, no Mistral/S2.");
+  }
 
   const mistralKey = process.env.MISTRAL_API_KEY;
-  if (!mistralKey) {
+  if (!mistralKey && !fetchOnly) {
     console.error("Error: MISTRAL_API_KEY environment variable is required.");
+    console.error("Use --fetch-only to test YouTube/S2 without Mistral.");
     process.exit(1);
   }
 
   const s2Key = process.env.S2_API_KEY;
 
-  console.log("Fetching channel videos and transcripts...");
-  const videos = await fetchChannelVideosWithTranscripts(lastN);
+  await mkdir(OUTPUT_DIR, { recursive: true });
+  await mkdir(TRANSCRIPTS_DIR, { recursive: true });
+
+  console.log("Fetching channel videos and transcripts (cache: output/transcripts/)...");
+  const videos = await fetchChannelVideosWithTranscripts(lastN, TRANSCRIPTS_DIR);
   console.log(`Fetched ${videos.length} videos with transcripts.`);
 
   if (videos.length === 0) {
     console.error("No videos with transcripts found. Exiting.");
     process.exit(1);
+  }
+
+  if (fetchOnly) {
+    console.log("\nFetch-only complete. Videos:");
+    videos.forEach((v) => console.log(`  - ${v.title} (${v.videoId})`));
+    return;
   }
 
   console.log("Extracting manipulation techniques with Mistral...");

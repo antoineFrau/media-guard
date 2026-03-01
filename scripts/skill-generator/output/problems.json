@@ -1,0 +1,152 @@
+{
+  "generatedAt": "2026-02-28T17:42:39.504Z",
+  "channel": {
+    "handle": "@Clemovitch",
+    "name": "Clément Viktorovitch"
+  },
+  "videosProcessed": [
+    "Iizvn8ZGma4"
+  ],
+  "techniques": [
+    {
+      "name": "Appel à la peur",
+      "slug": "appel-a-la-peur",
+      "description": "Technique de manipulation qui consiste à susciter la peur chez l'auditoire pour influencer son opinion ou son comportement. Cela peut inclure des descriptions dramatiques, des scénarios catastrophiques ou des menaces implicites.",
+      "examples": [
+        {
+          "quote": "On parle donc aujourd'hui du drame autour de Quentin de Rank. Au récit de l'extrême droit, très largement relayé dans nos médias durant tout le weekend et très largement fondé sur des fantasmes.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Introduction du sujet avec un ton dramatique pour capter l'attention et susciter la peur."
+        },
+        {
+          "quote": "La menace sur la République française, c'est la France insoumise.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Utilisation d'une menace implicite pour créer un sentiment d'urgence et de danger."
+        }
+      ],
+      "category": "rhetoric",
+      "sources": [],
+      "skillPath": "skills/appel-a-la-peur/SKILL.md"
+    },
+    {
+      "name": "Fausse symétrie",
+      "slug": "fausse-symmetrie",
+      "description": "Technique qui consiste à présenter deux côtés d'un débat comme équivalents ou symétriques, même s'ils ne le sont pas. Cela peut être utilisé pour minimiser la gravité d'une position ou pour éviter de prendre parti.",
+      "examples": [
+        {
+          "quote": "Le procureur de la République de Lyon a battu en brèche hier la teste d'un affrontement entre deux bandes rivales de militants politiques.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Présentation de deux groupes comme équivalents, alors que les faits montrent une différence significative."
+        },
+        {
+          "quote": "Les méchants ne sont pas les bons méchants.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Utilisation d'une fausse symétrie pour inverser les rôles des victimes et des agresseurs."
+        }
+      ],
+      "category": "bias",
+      "sources": [],
+      "skillPath": "skills/fausse-symmetrie/SKILL.md"
+    },
+    {
+      "name": "Inversion accusatoire",
+      "slug": "inversion-accusatoire",
+      "description": "Technique qui consiste à accuser l'adversaire des actions ou des intentions que l'on a soi-même. Cela peut être utilisé pour détourner l'attention ou pour discréditer l'opposition.",
+      "examples": [
+        {
+          "quote": "Les antifascistes sont bel et bien les fascistes d'aujourd'hui.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Accusation des antifascistes d'être fascistes, inversant ainsi les rôles."
+        },
+        {
+          "quote": "La France insoumise a fait de la jeune garde son bras armé. pour semer la terreur et la violence à l'université ou dans la rue.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Accusation de la France insoumise de semer la terreur, alors que les faits montrent une violence principalement venue de l'extrême droite."
+        }
+      ],
+      "category": "rhetoric",
+      "sources": [],
+      "skillPath": "skills/inversion-accusatoire/SKILL.md"
+    },
+    {
+      "name": "Montée en généralité",
+      "slug": "montee-en-generalite",
+      "description": "Technique qui consiste à généraliser à partir d'un cas spécifique ou d'un événement isolé. Cela peut être utilisé pour créer une impression de menace généralisée ou pour justifier des actions extrêmes.",
+      "examples": [
+        {
+          "quote": "La violence d'extrême droite dans notre pays n'existe pas.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Négation de la violence d'extrême droite en général, malgré des preuves spécifiques."
+        },
+        {
+          "quote": "La France insoumise a fait de la jeune garde son bras armé.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Généralisation de l'action d'un groupe spécifique à un parti politique entier."
+        }
+      ],
+      "category": "bias",
+      "sources": [],
+      "skillPath": "skills/montee-en-generalite/SKILL.md"
+    },
+    {
+      "name": "Désinformation",
+      "slug": "desinformation",
+      "description": "Technique qui consiste à diffuser des informations fausses ou trompeuses pour influencer l'opinion publique ou pour discréditer une personne ou un groupe. Cela peut inclure des mensonges directs, des omissions ou des déformations des faits.",
+      "examples": [
+        {
+          "quote": "Il a été raconté que ça aurait été un guet-apens tendu par de méchants antifascistes contre de pauvres et gentils jeunes hommes nationalistes qui passaient par là.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Diffusion d'une information fausse pour créer une narrative trompeuse."
+        },
+        {
+          "quote": "La France insoumise a fait de la jeune garde son bras armé.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Désinformation en liant un groupe à un parti politique sans preuve."
+        }
+      ],
+      "category": "factual",
+      "sources": [],
+      "skillPath": "skills/desinformation/SKILL.md"
+    },
+    {
+      "name": "Légitimation de l'illégitime",
+      "slug": "legitimation-de-l-illegitime",
+      "description": "Technique qui consiste à présenter des groupes ou des idées extrêmes ou violents comme légitimes ou normaux. Cela peut être utilisé pour normaliser des comportements inacceptables ou pour gagner des sympathisants.",
+      "examples": [
+        {
+          "quote": "À quel moment on a considéré que Nemmésis était une voix légitime, ordinaire et tout à fait banale dans le débat public ?",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Question rhétorique pour souligner l'inacceptabilité de la légitimation d'un groupe extrême."
+        },
+        {
+          "quote": "On parle d'une action de Némésis comme si on en là en ce moment on est en train de parler depuis 5 jours d'une action de propagande de Némésis exactement comme on parlerait d'une d'une manifestation de la CGT ou de l'UNEF.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Comparaison d'un groupe extrême avec des syndicats légitimes pour normaliser son action."
+        }
+      ],
+      "category": "framing",
+      "sources": [],
+      "skillPath": "skills/legitimation-de-l-illegitime/SKILL.md"
+    },
+    {
+      "name": "Victimisation",
+      "slug": "victimisation",
+      "description": "Technique qui consiste à se présenter ou à présenter un groupe comme victime, même lorsque ce n'est pas le cas. Cela peut être utilisé pour gagner de la sympathie ou pour justifier des actions agressives.",
+      "examples": [
+        {
+          "quote": "Les méchants ne sont pas les bons méchants.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Inversion des rôles pour présenter l'extrême droite comme victime."
+        },
+        {
+          "quote": "La France insoumise a fait de la jeune garde son bras armé. pour semer la terreur et la violence à l'université ou dans la rue.",
+          "videoId": "Iizvn8ZGma4",
+          "context": "Présentation de la France insoumise comme responsable de la violence, alors qu'elle en est victime."
+        }
+      ],
+      "category": "rhetoric",
+      "sources": [],
+      "skillPath": "skills/victimisation/SKILL.md"
+    }
+  ]
+}

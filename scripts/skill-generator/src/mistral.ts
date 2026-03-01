@@ -78,9 +78,15 @@ Focus on techniques that are well-defined and have clear examples. Merge similar
   const result = ExtractionResultSchema.safeParse(parsed);
   if (!result.success) {
     console.warn("Mistral response did not match schema, attempting to fix:", result.error.message);
-    const fallback = typeof parsed === "object" && parsed !== null && "techniques" in parsed
-      ? { techniques: (parsed as { techniques: unknown }).techniques }
-      : { techniques: [] };
+    let techniques: unknown[] = [];
+    if (Array.isArray(parsed)) {
+      techniques = parsed;
+    } else if (typeof parsed === "object" && parsed !== null && "techniques" in parsed) {
+      techniques = Array.isArray((parsed as { techniques: unknown }).techniques)
+        ? (parsed as { techniques: unknown[] }).techniques
+        : [];
+    }
+    const fallback = { techniques };
     const fixed = ExtractionResultSchema.safeParse(fallback);
     if (!fixed.success) {
       throw new Error(`Failed to parse Mistral response: ${result.error.message}`);
@@ -132,6 +138,95 @@ ${examplesContext}
 ${sourcesContext}
 
 Output the complete SKILL.md content only.`;
+
+  const response = await client.chat.complete({
+    model: MODEL,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    maxTokens: 4096,
+    temperature: 0.3,
+  });
+
+  const rawContent = response.choices?.[0]?.message?.content;
+  if (rawContent == null) {
+    throw new Error("Empty SKILL.md response from Mistral");
+  }
+  return typeof rawContent === "string"
+    ? rawContent
+    : Array.isArray(rawContent)
+      ? (rawContent as { text?: string }[]).map((c) => c?.text ?? "").join("")
+      : String(rawContent);
+}
+
+/**
+ * Dataset-backed technique definition for skill generation.
+ */
+export interface TechniqueDefinitionInput {
+  slug: string;
+  name: string;
+  nameFr?: string;
+  definition: string;
+  example?: string;
+  examples?: string[];
+  sources: string[];
+}
+
+/**
+ * Generate a SKILL.md from a dataset-backed technique definition.
+ * Uses SemEval/PTC taxonomy; outputs skills for text (articles/transcripts) recognition.
+ */
+export async function generateSkillFromDefinition(
+  apiKey: string,
+  technique: TechniqueDefinitionInput,
+  sources: PaperSource[] = []
+): Promise<string> {
+  const client = new Mistral({ apiKey });
+
+  const examples = technique.examples?.length
+    ? technique.examples
+    : technique.example
+      ? [technique.example]
+      : [];
+  const examplesContext = examples
+    .slice(0, 5)
+    .map((e) => `- "${e}"`)
+    .join("\n");
+
+  const sourcesContext =
+    sources.length > 0
+      ? sources
+          .map(
+            (s) =>
+              `- ${s.title} (${s.year ?? "n.d."}): ${s.abstract ?? "No abstract"} | URL: ${s.url}`
+          )
+          .join("\n")
+      : technique.sources.map((s) => `- ${s}`).join("\n");
+
+  const systemPrompt = `You generate Cursor SKILL.md files that teach an AI agent to recognize and analyze media/political manipulation techniques in text (news articles, video transcripts, political discourse).
+
+Use the SemEval/PTC taxonomy. The slug MUST be exactly: ${technique.slug}
+
+Output format:
+1. YAML frontmatter with name: "${technique.slug}" and description (third person, max 1024 chars, include trigger terms in FR and EN)
+2. Sections: ## What it is, ## How to recognize it, ## Examples, ## Research backing
+3. Concise, under 200 lines total
+4. Include bilingual trigger terms (French and English) where relevant`;
+
+  const userPrompt = `Generate a SKILL.md for this manipulation technique:
+
+**Technique (slug):** ${technique.slug}
+**Name:** ${technique.name}${technique.nameFr ? ` (FR: ${technique.nameFr})` : ""}
+**Definition:** ${technique.definition}
+
+**Examples from dataset:**
+${examplesContext || "(no examples provided)"}
+
+**Sources to cite:**
+${sourcesContext}
+
+Output the complete SKILL.md content only. Use the slug "${technique.slug}" consistently.`;
 
   const response = await client.chat.complete({
     model: MODEL,

@@ -17,8 +17,14 @@
 
     <div class="field">
       <label for="api-url">API Base URL</label>
-      <input type="url" id="api-url" placeholder="https://your-worker.workers.dev">
+      <input type="url" id="api-url" placeholder="http://localhost:3000">
       <span class="hint">Optional. Default: MediaGuard API.</span>
+    </div>
+
+    <div class="field">
+      <label for="elevenlabs-key">ElevenLabs API Key</label>
+      <input type="password" id="elevenlabs-key" placeholder="Optional — uses server key if empty">
+      <span class="hint">For audio capture when video has no captions.</span>
     </div>
 
     <button id="save-btn">Save</button>

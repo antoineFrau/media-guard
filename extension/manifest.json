@@ -15,17 +15,30 @@
   ],
   "host_permissions": [
     "https://*/*",
-    "*://www.youtube.com/*"
+    "*://www.youtube.com/*",
+    "http://localhost:*/*",
+    "http://127.0.0.1:*/*",
+    "https://api.elevenlabs.io/*"
   ],
   "background": {
-    "scripts": ["background/service-worker.js"],
+    "scripts": [
+      "background/service-worker.js"
+    ],
     "service_worker": "background/service-worker.js"
   },
   "content_scripts": [
     {
-      "matches": ["*://www.youtube.com/watch*"],
-      "js": ["lib/youtube.js", "content/content.js"],
-      "css": ["content/overlay.css"],
+      "matches": [
+        "*://www.youtube.com/watch*"
+      ],
+      "js": [
+        "lib/youtube.js",
+        "content/capture-audio.js",
+        "content/content.js"
+      ],
+      "css": [
+        "content/overlay.css"
+      ],
       "run_at": "document_end"
     }
   ],
