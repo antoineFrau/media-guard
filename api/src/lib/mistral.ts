@@ -43,6 +43,13 @@ function formatTranscriptText(transcript: TranscriptSegment[]): string {
     .join("\n");
 }
 
+const LOG_MAX_LEN = 2000; // Max chars to log for prompts/responses
+
+function truncateForLog(s: string, max = LOG_MAX_LEN): string {
+  if (s.length <= max) return s;
+  return s.slice(0, max) + `\n... [truncated, ${s.length - max} more chars]`;
+}
+
 async function callMistralJson<T>(
   apiKey: string,
   systemPrompt: string,
@@ -55,6 +62,9 @@ async function callMistralJson<T>(
     { role: "system" as const, content: systemPrompt },
     { role: "user" as const, content: userContent },
   ];
+
+  console.log(`[mistral] ${phaseName} — system prompt:\n${truncateForLog(systemPrompt)}`);
+  console.log(`[mistral] ${phaseName} — user prompt:\n${truncateForLog(userContent)}`);
 
   return traceMistralCall(trace, phaseName, messages, async () => {
     const res = await fetch(MISTRAL_API_URL, {
@@ -79,7 +89,12 @@ async function callMistralJson<T>(
 
     const data = (await res.json()) as MistralResponse;
     const content = data?.choices?.[0]?.message?.content;
-    if (!content) return null;
+    if (!content) {
+      console.log(`[mistral] ${phaseName} — no content in response`);
+      return null;
+    }
+
+    console.log(`[mistral] ${phaseName} — response:\n${truncateForLog(content)}`);
 
     try {
       return JSON.parse(content) as T;

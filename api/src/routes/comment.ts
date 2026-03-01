@@ -78,6 +78,10 @@ commentRoutes.post("/improve", async (c) => {
     },
   });
 
+  const commentCount = await prisma.annotationComment.count({
+    where: { annotationId: annotation_id },
+  });
+
   return c.json({
     id: updated.id,
     video_id: updated.videoId,
@@ -87,7 +91,7 @@ commentRoutes.post("/improve", async (c) => {
     content: updated.content,
     explanation: updated.explanation,
     sources: updated.sources,
-    user_comments: updated.userComments,
+    comment_count: commentCount,
     version: updated.version,
     created_at: updated.createdAt,
     updated_at: updated.updatedAt,

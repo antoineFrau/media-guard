@@ -156,7 +156,7 @@ media-guard/
 
 ***4.1 Segment Display on Video***
 
-- *Parse analysis response:* `alerts` *and* `fact_checks` *with* `start`*/`*end` *(or* `timestamp_start`*/*`timestamp_end`*)*
+- *Parse analysis response:* `alerts` *and* `fact_checks` *with* `start`*/`*end` (or `timestamp_start`*/*`timestamp_end`*)*
 - *Render marker bars on the progress bar (similar to SponsorBlock): colored segments for* `manipulation`*,* `fact_check`*, etc.*
 - *Floating panel (bottom or side): when playback enters a segment, show alert details (technique, quote, explanation)*
 - *Use* `timeupdate` *on* `video` *to detect current segment and show/hide panel*

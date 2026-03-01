@@ -13,6 +13,12 @@
   let loadError = null;
   let overlayRoot = null;
   let lastVideoId = null;
+  let toolbarButton = null;
+  let isRecording = false;
+  let recordingTimerId = null;
+  let captureStoppedHideTimeoutId = null;
+  let captureStopCallback = null;
+  let recordingUpdateMsg = null;
 
   function init() {
     const currentId = MediaGuardYouTube.getVideoId();
@@ -34,6 +40,7 @@
     }
 
     setupOverlay();
+    setupToolbarButton();
     video.addEventListener('play', onPlay);
     video.addEventListener('timeupdate', onTimeUpdate);
     watchForVideoChange();
@@ -77,8 +84,92 @@
     updateIconBadge({});
   }
 
+  function setupToolbarButton() {
+    const existing = document.getElementById('mediaguard-toolbar-button');
+    if (existing) existing.remove();
+    toolbarButton = null;
+
+    function inject() {
+      const rightControls = MediaGuardYouTube.getRightControls();
+      if (!rightControls) return false;
+      if (document.getElementById('mediaguard-toolbar-button')) return true;
+
+      const settingsBtn = rightControls.querySelector('.ytp-settings-button') ||
+        rightControls.querySelector('.ytp-button.ytp-settings-button');
+      const btn = document.createElement('button');
+      btn.id = 'mediaguard-toolbar-button';
+      btn.className = 'ytp-button mediaguard-toolbar-button';
+      btn.title = 'MediaGuard';
+      btn.setAttribute('aria-label', 'MediaGuard');
+
+      const icon = document.createElement('img');
+      icon.src = runtime.getURL('icons/icon32.png');
+      icon.alt = '';
+      icon.className = 'mediaguard-toolbar-icon';
+
+      const badge = document.createElement('span');
+      badge.className = 'mediaguard-toolbar-badge mediaguard-badge-pulse-blue';
+
+      btn.appendChild(icon);
+      btn.appendChild(badge);
+      toolbarButton = btn;
+
+      // insertBefore requires the reference node to be a direct child of the parent.
+      // querySelector returns any descendant; YouTube's DOM may nest buttons.
+      const ref = (settingsBtn && settingsBtn.parentNode === rightControls)
+        ? settingsBtn
+        : rightControls.firstChild;
+      if (ref) {
+        rightControls.insertBefore(btn, ref);
+      } else {
+        rightControls.appendChild(btn);
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isRecording) return;
+        startAudioCapture();
+      });
+
+      updateToolbarBadge();
+      return true;
+    }
+
+    if (!inject()) {
+      const interval = setInterval(() => {
+        if (inject()) clearInterval(interval);
+      }, 300);
+      setTimeout(() => clearInterval(interval), 10000);
+    }
+  }
+
+  function updateToolbarBadge() {
+    if (!toolbarButton) return;
+    const badge = toolbarButton.querySelector('.mediaguard-toolbar-badge');
+    if (!badge) return;
+
+    badge.className = 'mediaguard-toolbar-badge';
+    badge.textContent = '';
+
+    if (isRecording) {
+      badge.classList.add('mediaguard-badge-pulse-red');
+    } else {
+      badge.classList.add('mediaguard-badge-pulse-blue');
+    }
+  }
+
   function updateIconBadge(opts) {
     runtime.sendMessage({ action: 'updateIconBadge', ...opts }).catch(() => {});
+  }
+
+  function hidePlaceholder() {
+    if (!overlayRoot) return;
+    const area = overlayRoot.querySelector('.mediaguard-placeholder-area');
+    if (area) {
+      area.innerHTML = '';
+      area.style.display = 'none';
+    }
   }
 
   function showPlaceholder(message, isError = false) {
@@ -89,6 +180,7 @@
       area.className = 'mediaguard-placeholder-area';
       overlayRoot.appendChild(area);
     }
+    area.style.display = '';
     const div = document.createElement('div');
     div.className = 'mediaguard-placeholder' + (isError ? ' mediaguard-error' : '');
     div.textContent = message;
@@ -121,7 +213,7 @@
   }
 
   function showPlaceholderWithStop(message, onStop) {
-    if (!overlayRoot) return;
+    if (!overlayRoot) return () => {};
     let area = overlayRoot.querySelector('.mediaguard-placeholder-area');
     if (!area) {
       area = document.createElement('div');
@@ -130,15 +222,17 @@
     }
     const div = document.createElement('div');
     div.className = 'mediaguard-placeholder';
-    div.appendChild(document.createTextNode(message + ' '));
+    const msgNode = document.createTextNode(message + ' ');
+    div.appendChild(msgNode);
     const btn = document.createElement('button');
     btn.className = 'mediaguard-retry';
-    btn.style.cssText = 'background:#dc2626;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;margin-left:8px;';
+    btn.style.cssText = 'background:#78716c;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;margin-left:8px;';
     btn.textContent = 'Stop';
     btn.addEventListener('click', (e) => { e.preventDefault(); onStop(); });
     div.appendChild(btn);
     area.innerHTML = '';
     area.appendChild(div);
+    return (newMsg) => { msgNode.textContent = newMsg + ' '; };
   }
 
   async function startAudioCapture() {
@@ -146,11 +240,26 @@
       showPlaceholder('Capture not available.', true);
       return;
     }
-    const config = await runtime.sendMessage({ action: 'getApiConfig' });
-    updateIconBadge({ recording: true });
-    showPlaceholder('Capturing… Select this tab and check "Share tab audio".');
-
     const videoEl = MediaGuardYouTube.getVideoElement();
+    if (!videoEl) {
+      showPlaceholder('Video element not found.', true);
+      return;
+    }
+    if (videoEl.paused) {
+      showPlaceholder('Starting video…');
+      try {
+        await videoEl.play();
+      } catch (err) {
+        showPlaceholder('Could not play video. Try playing it manually.', true);
+        return;
+      }
+    }
+
+    const config = await runtime.sendMessage({ action: 'getApiConfig' });
+    isRecording = true;
+    updateIconBadge({ recording: true });
+    updateToolbarBadge();
+    showPlaceholder('Capturing… Select this tab and check "Share tab audio".');
     window.MediaGuardCapture.startCapture({
       videoId,
       videoElement: videoEl,
@@ -159,26 +268,75 @@
       elevenlabsKey: config.elevenlabsKey || undefined,
       sttProvider: config.sttProvider || 'elevenlabs',
       onStatus: (msg) => {
-        showPlaceholder(msg);
+        if (isRecording && captureStopCallback) {
+          const updateMsg = showPlaceholderWithStop(msg, captureStopCallback);
+          recordingUpdateMsg = updateMsg;
+        } else {
+          showPlaceholder(msg);
+        }
       },
       onTranscript: () => {},
-      onComplete: (data) => {
+      onComplete: (data, opts = {}) => {
+        if (!opts.continueRecording) {
+          if (recordingTimerId) clearInterval(recordingTimerId);
+          recordingTimerId = null;
+          isRecording = false;
+          const count = data ? (data.alerts?.length || 0) + (data.fact_checks?.length || 0) : undefined;
+          updateIconBadge({ recording: false, issueCount: count });
+          updateToolbarBadge();
+        }
         analysisData = data;
-        loadAnnotations().then(() => renderOverlay());
+        loadAnnotations().then(() => {
+          renderOverlay();
+          if (opts.continueRecording && captureStopCallback) {
+            const newUpdateMsg = showPlaceholderWithStop('Analysis sent. Still recording…', captureStopCallback);
+            recordingUpdateMsg = (msg) => {
+              const m = msg.match(/(\d+):(\d{2})/);
+              const time = m ? `${m[1]}:${m[2]}` : '0:00';
+              newUpdateMsg(`Still recording… ${time} — Click Stop when done`);
+            };
+          }
+        });
       },
       onError: (msg) => {
+        if (recordingTimerId) clearInterval(recordingTimerId);
+        recordingTimerId = null;
+        isRecording = false;
         updateIconBadge({ recording: false });
+        updateToolbarBadge();
         showPlaceholder(msg, true);
       },
-      onCaptureStart: (cleanup) => {
-        showPlaceholderWithStop('Capturing audio… Wait 1 min for auto-analyze.', () => {
-          if (typeof cleanup === 'function') cleanup();
+      onCaptureStart: (stopFn) => {
+        const startTime = Date.now();
+        captureStopCallback = () => {
+          console.log('[MediaGuard] Stop clicked, calling stopFn');
+          if (recordingTimerId) {
+            clearInterval(recordingTimerId);
+            recordingTimerId = null;
+          }
+          if (typeof stopFn === 'function') stopFn();
+          isRecording = false;
           const count = analysisData
             ? (analysisData.alerts?.length || 0) + (analysisData.fact_checks?.length || 0)
             : undefined;
           updateIconBadge({ recording: false, issueCount: count });
+          updateToolbarBadge();
           showPlaceholder('Capture stopped.');
-        });
+          if (captureStoppedHideTimeoutId) clearTimeout(captureStoppedHideTimeoutId);
+          captureStoppedHideTimeoutId = setTimeout(() => {
+            captureStoppedHideTimeoutId = null;
+            hidePlaceholder();
+          }, 10000);
+        };
+        const updateMsg = showPlaceholderWithStop('Capturing audio… 0:00 — Auto-analyze at 10s', captureStopCallback);
+        recordingUpdateMsg = updateMsg;
+        recordingTimerId = setInterval(() => {
+          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+          const m = Math.floor(elapsed / 60);
+          const s = elapsed % 60;
+          const msg = `Capturing audio… ${m}:${String(s).padStart(2, '0')} — Auto-analyze at 10s`;
+          if (recordingUpdateMsg) recordingUpdateMsg(msg);
+        }, 1000);
       }
     });
   }
@@ -192,15 +350,12 @@
   async function loadAnalysis() {
     console.log('[MediaGuard ext] loadAnalysis start', videoId);
     const config = await runtime.sendMessage({ action: 'getApiConfig' });
-    if (!config.mistralKey) {
-      updateIconBadge({});
-      showPlaceholder('Configure Mistral key in extension settings.', true);
-      return;
-    }
+    // Note: We still attempt getAnalysis even without Mistral key — API may return cached data
 
     isLoading = true;
     loadError = null;
     updateIconBadge({});
+    updateToolbarBadge();
     showPlaceholder('Loading analysis...');
 
     const response = await runtime.sendMessage({ action: 'getAnalysis', videoId });
@@ -212,9 +367,17 @@
       const status = response.status;
       const errMsg = response.error || 'Analysis failed';
       updateIconBadge({});
+      updateToolbarBadge();
+      // Always try to load annotations — they may exist even when analysis fails (e.g. no transcript)
+      await loadAnnotations();
+      if (analysisData && (analysisData.alerts?.length > 0 || analysisData.fact_checks?.length > 0)) {
+        // Got insights from annotations, show them (loadAnnotations already called renderOverlay)
+        updateToolbarBadge();
+        return;
+      }
       if (status === 404) {
         if (response.error === 'no_transcript') {
-      showPlaceholder('No captions — use extension popup to capture audio.');
+          showPlaceholder('No captions — use extension popup to capture audio.');
         } else {
           showPlaceholder('Analysis failed. Configure Mistral key in extension.', true);
         }
@@ -229,6 +392,7 @@
     analysisData = response;
     await loadAnnotations();
     renderOverlay();
+    updateToolbarBadge();
   }
 
   function renderOverlay() {
@@ -241,24 +405,19 @@
 
     if (!hasAlerts && !hasFactChecks) {
       updateIconBadge({ issueCount: 0 });
-      showPlaceholder('No issues detected in this video.');
+      updateToolbarBadge();
+      const area = overlayRoot.querySelector('.mediaguard-placeholder-area');
+      if (area) area.innerHTML = '';
       return;
     }
 
     const issueCount = alerts.length + factChecks.length;
     updateIconBadge({ issueCount });
+    updateToolbarBadge();
     const area = overlayRoot.querySelector('.mediaguard-placeholder-area');
     if (area) area.innerHTML = '';
     renderSegmentMarkers();
     renderFloatingPanel();
-    if (hasUncoveredDuration()) {
-      const coveredEnd = getCoveredEndTime();
-      const remaining = Math.round(video.duration - coveredEnd);
-      const mins = Math.floor(remaining / 60);
-      const secs = Math.round(remaining % 60);
-      const remainingStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
-      showPlaceholder(`Partial analysis (${remainingStr} left) — capture via extension popup.`);
-    }
   }
 
   let progressBarHoverListenersAttached = false;
@@ -323,7 +482,15 @@
       const segs = getSegmentsAtMouseX(e.clientX);
       if (segs && segs.length > 0) {
         const anchor = getSegmentAnchorRect(segs[0]);
-        updateFloatingPanel(segs, 0, anchor);
+        let idx = 0;
+        if (panel && !panel.classList.contains('mediaguard-hidden') && panel._mediaguardSegments && panel._mediaguardSegments.length === segs.length) {
+          const a = panel._mediaguardSegments[0];
+          const b = segs[0];
+          if (Math.abs((a?.start ?? 0) - (b?.start ?? 0)) < 1) {
+            idx = Math.min(panel._mediaguardSegIndex ?? 0, segs.length - 1);
+          }
+        }
+        updateFloatingPanel(segs, idx, anchor);
       } else {
         updateFloatingPanel(null);
       }
@@ -372,7 +539,10 @@
 
     segments.forEach((seg) => {
       const bar = document.createElement('div');
-      bar.className = `mediaguard-segment-bar mediaguard-${seg.type}`;
+      const up = seg.data?.upvotes ?? 0;
+      const down = seg.data?.downvotes ?? 0;
+      const isProblematic = down > up;
+      bar.className = `mediaguard-segment-bar mediaguard-${seg.type}` + (isProblematic ? ' mediaguard-deprecated' : '');
       bar.style.left = `${(seg.start / video.duration) * 100}%`;
       bar.style.width = `${((seg.end - seg.start) / video.duration) * 100}%`;
       bar.title = seg.label || seg.type;
@@ -460,13 +630,18 @@
   function renderSegmentContent(container, segment) {
     container.innerHTML = '';
     const d = segment.data;
+    const up = d.upvotes ?? 0;
+    const down = d.downvotes ?? 0;
+    const isProblematic = down > up;
+    if (isProblematic) container.classList.add('mediaguard-deprecated');
+    else container.classList.remove('mediaguard-deprecated');
 
     const header = document.createElement('div');
     header.className = 'mediaguard-panel-header';
 
     const typeSpan = document.createElement('span');
     typeSpan.className = 'mediaguard-panel-type ' + segment.type;
-    typeSpan.textContent = segment.type === 'manipulation' ? 'Manipulation' : 'Fact Check';
+    typeSpan.textContent = segment.type === 'manipulation' ? 'Rhetorical technique' : 'Fact Check';
 
     const badge = document.createElement('span');
     badge.className = segment.type === 'manipulation'
@@ -583,11 +758,21 @@
     voteRow.appendChild(downBtn);
     container.appendChild(voteRow);
 
+    const commentCount = d.comment_count ?? 0;
+    const commentRow = document.createElement('div');
+    commentRow.className = 'mediaguard-comment-row';
     const btn = document.createElement('button');
     btn.className = 'mediaguard-comment-btn';
-    btn.textContent = 'Add context / Report';
+    btn.textContent = 'Add context';
     btn.addEventListener('click', () => openCommentModal(segment));
-    container.appendChild(btn);
+    commentRow.appendChild(btn);
+    if (commentCount > 0) {
+      const countSpan = document.createElement('span');
+      countSpan.className = 'mediaguard-comment-count';
+      countSpan.textContent = commentCount + ' comment' + (commentCount === 1 ? '' : 's');
+      commentRow.appendChild(countSpan);
+    }
+    container.appendChild(commentRow);
   }
 
   function updateFloatingPanel(segments, index, barElementOrAnchor) {
@@ -608,6 +793,8 @@
 
     const isNavigating = hasMultiple && panel._mediaguardSegments === segments;
     if (isNavigating) {
+      panel._mediaguardSegIndex = segIndex;
+      panel._mediaguardAnchor = barElementOrAnchor ?? panel._mediaguardAnchor;
       const contentWrap = panel.querySelector('.mediaguard-panel-content');
       const countSpan = panel.querySelector('.mediaguard-slider-count');
       const prevBtn = panel.querySelector('.mediaguard-slider-btn');
@@ -624,6 +811,8 @@
     panel.classList.remove('mediaguard-hidden');
     panel.innerHTML = '';
     panel._mediaguardSegments = segments;
+    panel._mediaguardSegIndex = segIndex;
+    panel._mediaguardAnchor = barElementOrAnchor;
 
     if (hasMultiple) {
       const sliderRow = document.createElement('div');
@@ -636,7 +825,8 @@
       prevBtn.disabled = segIndex === 0;
       prevBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (segIndex > 0) updateFloatingPanel(segments, segIndex - 1, barElementOrAnchor);
+        const idx = panel._mediaguardSegIndex ?? 0;
+        if (idx > 0) updateFloatingPanel(panel._mediaguardSegments, idx - 1, panel._mediaguardAnchor);
       });
 
       const countSpan = document.createElement('span');
@@ -650,7 +840,8 @@
       nextBtn.disabled = segIndex === segments.length - 1;
       nextBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (segIndex < segments.length - 1) updateFloatingPanel(segments, segIndex + 1, barElementOrAnchor);
+        const idx = panel._mediaguardSegIndex ?? 0;
+        if (idx < (panel._mediaguardSegments?.length ?? 0) - 1) updateFloatingPanel(panel._mediaguardSegments, idx + 1, panel._mediaguardAnchor);
       });
 
       sliderRow.appendChild(prevBtn);
@@ -816,7 +1007,8 @@
           id: ann.id,
           upvotes: ann.upvotes ?? 0,
           downvotes: ann.downvotes ?? 0,
-          user_vote: ann.user_vote
+          user_vote: ann.user_vote,
+          comment_count: ann.comment_count ?? 0
         });
       } else {
         const existing = (analysisData.fact_checks || []).find(
@@ -833,7 +1025,8 @@
           id: ann.id,
           upvotes: ann.upvotes ?? 0,
           downvotes: ann.downvotes ?? 0,
-          user_vote: ann.user_vote
+          user_vote: ann.user_vote,
+          comment_count: ann.comment_count ?? 0
         });
       }
     });

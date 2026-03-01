@@ -1,4 +1,5 @@
 /* MediaGuard overlay styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@400;600&display=swap');
 
 #mediaguard-overlay-root {
   position: absolute;
@@ -22,25 +23,25 @@
 
 .mediaguard-placeholder {
   padding: 6px 10px;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(30, 58, 95, 0.9);
   color: #fff;
   font-size: 11px;
   border-radius: 4px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .mediaguard-placeholder.mediaguard-error {
-  background: rgba(185, 28, 28, 0.9);
+  background: rgba(120, 113, 108, 0.95);
 }
 
 .mediaguard-placeholder a.mediaguard-retry {
-  color: #93c5fd;
+  color: #fde68a;
   text-decoration: underline;
   margin-left: 4px;
 }
 
 .mediaguard-placeholder a.mediaguard-retry:hover {
-  color: #bfdbfe;
+  color: #fef3c7;
 }
 
 .mediaguard-segment-markers {
@@ -69,24 +70,36 @@
 }
 
 .mediaguard-segment-bar.mediaguard-manipulation {
-  background: #ea580c;
+  background: #F59E0B;
 }
 
 .mediaguard-segment-bar.mediaguard-fact-check {
-  background: #2563eb;
+  background: #1E3A5F;
+}
+
+.mediaguard-segment-bar.mediaguard-deprecated {
+  opacity: 0.25;
+}
+
+.mediaguard-segment-bar.mediaguard-deprecated:hover {
+  opacity: 0.5;
 }
 
 .mediaguard-floating-panel {
   position: fixed;
-  max-width: 360px;
+  width: 360px;
+  height: 380px;
   padding: 12px;
-  background: rgba(17, 24, 39, 0.95);
-  color: #f3f4f6;
+  background: rgba(255, 255, 255, 0.97);
+  color: #374151;
   font-size: 13px;
   border-radius: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   transition: opacity 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .mediaguard-floating-panel.mediaguard-hidden {
@@ -100,7 +113,8 @@
   gap: 10px;
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
 }
 
 .mediaguard-slider-btn {
@@ -109,9 +123,9 @@
   padding: 0;
   font-size: 14px;
   line-height: 1;
-  color: #e5e7eb;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #374151;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
   cursor: pointer;
   display: flex;
@@ -120,7 +134,7 @@
 }
 
 .mediaguard-slider-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
+  background: #e5e7eb;
 }
 
 .mediaguard-slider-btn:disabled {
@@ -133,11 +147,27 @@
   text-align: center;
   font-size: 12px;
   font-weight: 500;
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 .mediaguard-panel-content {
-  /* Wrapper for segment content when using slider */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mediaguard-panel-content.mediaguard-deprecated {
+  opacity: 0.35;
+}
+
+.mediaguard-panel-content.mediaguard-deprecated::before {
+  content: 'Low community score';
+  display: block;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-bottom: 6px;
 }
 
 .mediaguard-panel-header {
@@ -154,11 +184,11 @@
 }
 
 .mediaguard-panel-type.manipulation {
-  color: #fdba74;
+  color: #F59E0B;
 }
 
 .mediaguard-panel-type.fact-check {
-  color: #93c5fd;
+  color: #1E3A5F;
 }
 
 .mediaguard-panel-severity,
@@ -168,14 +198,14 @@
   border-radius: 4px;
 }
 
-.mediaguard-panel-severity.low { background: rgba(34, 197, 94, 0.3); }
-.mediaguard-panel-severity.medium { background: rgba(234, 179, 8, 0.3); }
-.mediaguard-panel-severity.high { background: rgba(239, 68, 68, 0.3); }
+.mediaguard-panel-severity.low { background: rgba(34, 197, 94, 0.2); color: #065f46; }
+.mediaguard-panel-severity.medium { background: rgba(245, 158, 11, 0.25); color: #92400e; }
+.mediaguard-panel-severity.high { background: rgba(120, 113, 108, 0.25); color: #44403c; }
 
 .mediaguard-panel-verdict.misleading,
-.mediaguard-panel-verdict.false { background: rgba(239, 68, 68, 0.3); }
+.mediaguard-panel-verdict.false { background: rgba(120, 113, 108, 0.25); color: #44403c; }
 .mediaguard-panel-verdict.true,
-.mediaguard-panel-verdict.verified { background: rgba(34, 197, 94, 0.3); }
+.mediaguard-panel-verdict.verified { background: rgba(34, 197, 94, 0.2); color: #065f46; }
 
 .mediaguard-panel-technique,
 .mediaguard-panel-claim {
@@ -188,12 +218,12 @@
   padding: 6px 0 6px 10px;
   border-left: 3px solid #6b7280;
   font-style: italic;
-  color: #d1d5db;
+  color: #4b5563;
 }
 
 .mediaguard-panel-explanation,
 .mediaguard-panel-context {
-  color: #d1d5db;
+  color: #4b5563;
   line-height: 1.5;
   margin-bottom: 8px;
 }
@@ -209,7 +239,7 @@
 }
 
 .mediaguard-panel-sources a {
-  color: #60a5fa;
+  color: #1E3A5F;
 }
 
 .mediaguard-vote-row {
@@ -225,16 +255,16 @@
   gap: 4px;
   padding: 4px 8px;
   font-size: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #9ca3af;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .mediaguard-vote-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
-  color: #e5e7eb;
+  background: #e5e7eb;
+  color: #374151;
 }
 
 .mediaguard-vote-btn:disabled {
@@ -243,23 +273,29 @@
 }
 
 .mediaguard-vote-btn.active {
-  color: #60a5fa;
-  border-color: #60a5fa;
+  color: #1E3A5F;
+  border-color: #1E3A5F;
 }
 
-.mediaguard-vote-up.active { color: #34d399; border-color: #34d399; }
-.mediaguard-vote-down.active { color: #f87171; border-color: #f87171; }
+.mediaguard-vote-up.active { color: #065f46; border-color: #065f46; }
+.mediaguard-vote-down.active { color: #78716c; border-color: #78716c; }
 
 .mediaguard-vote-count {
   font-size: 11px;
   font-weight: 500;
 }
 
-.mediaguard-comment-btn {
+.mediaguard-comment-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-top: 10px;
+}
+
+.mediaguard-comment-btn {
   padding: 6px 12px;
   font-size: 12px;
-  background: #3b82f6;
+  background: #1E3A5F;
   color: white;
   border: none;
   border-radius: 6px;
@@ -267,7 +303,12 @@
 }
 
 .mediaguard-comment-btn:hover {
-  background: #2563eb;
+  background: #15304d;
+}
+
+.mediaguard-comment-count {
+  font-size: 12px;
+  color: #6b7280;
 }
 
 /* Modal */
@@ -296,7 +337,7 @@
   border-radius: 8px;
   max-width: 400px;
   width: 90%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .mediaguard-modal-content h3 {
@@ -334,7 +375,64 @@
 }
 
 .mediaguard-modal-submit {
-  background: #3b82f6;
+  background: #1E3A5F;
   color: white;
   border: none;
+}
+
+/* Toolbar button (in YouTube right controls) */
+.mediaguard-toolbar-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 48px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.mediaguard-toolbar-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.mediaguard-toolbar-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mediaguard-badge-pulse-blue {
+  background: #3b82f6;
+  animation: mediaguard-pulse 1.2s ease-in-out infinite;
+}
+
+.mediaguard-badge-pulse-red {
+  background: #ef4444;
+  animation: mediaguard-pulse 1.2s ease-in-out infinite;
+}
+
+.mediaguard-badge-time {
+  width: auto;
+  height: auto;
+  min-width: 28px;
+  padding: 1px 4px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #fff;
+  background: #1E3A5F;
+  border-radius: 4px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  animation: none;
+}
+
+@keyframes mediaguard-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
 }

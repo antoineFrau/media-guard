@@ -1,5 +1,9 @@
 import { readdir, readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const DEFAULT_SKILLS_DIR = join(__dirname, "../../skills");
 
 export interface LoadedSkill {
   name: string;
@@ -29,7 +33,7 @@ function extractSection(content: string, heading: string): string {
 }
 
 export async function loadSkills(
-  skillsDir: string = join(process.cwd(), "scripts/skill-generator/output/skills-dataset"),
+  skillsDir: string = DEFAULT_SKILLS_DIR,
   maxSkills?: number
 ): Promise<LoadedSkill[]> {
   let entries: { name: string; isDirectory: () => boolean }[] = [];

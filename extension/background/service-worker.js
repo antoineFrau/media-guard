@@ -44,7 +44,7 @@ async function fetchWithConfig(url, options = {}) {
 // Pulse interval for recording badge (red alternating)
 let recordingPulseInterval = null;
 let recordingTabId = null;
-const RECORDING_PULSE_COLORS = ['#dc2626', '#b91c1c'];
+const RECORDING_PULSE_COLORS = ['#F59E0B', '#d97706'];
 
 function stopRecordingPulse() {
   if (recordingPulseInterval) {

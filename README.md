@@ -31,6 +31,7 @@ See [docs/CONCLUSION.md](docs/CONCLUSION.md) for full methodology, evaluation pr
 
 ## Components
 
+- **Landing Page** — Astro site in `web/` (deployed to GitHub Pages via `.github/workflows/deploy.yml`)
 - **API** — Backend for analysis, annotations, and crowdsourced improvements
 - **Browser Extension** — YouTube video analysis and fact-check overlays (Chrome, Firefox)
 - **STT App** — Real-time speech-to-text with Mic/Tab capture

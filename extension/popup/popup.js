@@ -67,7 +67,7 @@ function renderYouTubePanel(state, tabId) {
   const videoStatus = document.getElementById('video-status');
   const captureSection = document.getElementById('capture-section');
   const analysisSection = document.getElementById('analysis-section');
-  const issuesList = document.getElementById('issues-list');
+  const insightsList = document.getElementById('insights-list');
   const emptyState = document.getElementById('empty-state');
   const captureBtn = document.getElementById('capture-btn');
 
@@ -102,31 +102,31 @@ function renderYouTubePanel(state, tabId) {
   const needsCapture = loadError === 'no_transcript';
 
   if (hasAnalysis && segments && segments.length > 0) {
-    videoStatus.innerHTML = `<strong>${segments.length}</strong> issue(s) found`;
+    videoStatus.innerHTML = `<strong>${segments.length}</strong> insights`;
     videoStatus.className = 'status-area success';
     show(analysisSection);
     hide(captureSection);
     hide(emptyState);
 
-    issuesList.innerHTML = '';
+    insightsList.innerHTML = '';
     segments.forEach((seg, idx) => {
       const item = document.createElement('div');
-      item.className = `issue-item ${seg.type}`;
-      const label = seg.type === 'manipulation' ? (seg.data.technique || 'Manipulation') : (seg.data.claim || 'Fact check');
+      item.className = `insight-item ${seg.type}`;
+      const label = seg.type === 'manipulation' ? (seg.data.technique || 'Rhetorical technique') : (seg.data.claim || 'Fact check');
       const timeStr = formatTime(seg.start);
       item.innerHTML = `
-        <div class="issue-header">
-          <span class="issue-type">${seg.type === 'manipulation' ? '⚠' : '✓'} ${seg.type === 'manipulation' ? 'Manipulation' : 'Fact check'}</span>
+        <div class="insight-header">
+          <span class="insight-type">${seg.type === 'manipulation' ? '◉' : '✓'} ${seg.type === 'manipulation' ? 'Rhetorical technique' : 'Fact check'}</span>
           <button class="seek-btn" data-time="${seg.start}" data-idx="${idx}">Go to ${timeStr}</button>
         </div>
-        <div class="issue-label">${truncate(label, 80)}</div>
+        <div class="insight-label">${truncate(label, 80)}</div>
       `;
       const seekBtn = item.querySelector('.seek-btn');
       seekBtn.addEventListener('click', () => {
         tabs.sendMessage(tabId, { action: 'seekTo', time: seg.start });
         window.close();
       });
-      issuesList.appendChild(item);
+      insightsList.appendChild(item);
     });
   } else if (needsCapture) {
     show(captureSection);
@@ -141,9 +141,9 @@ function renderYouTubePanel(state, tabId) {
     hide(analysisSection);
     show(emptyState);
     if (analysisData && !hasAnalysis) {
-      videoStatus.textContent = 'No issues detected';
+      videoStatus.textContent = 'No insights';
       videoStatus.className = 'status-area success';
-      emptyState.innerHTML = '<p>This video was analyzed and no issues were found.</p>';
+      emptyState.innerHTML = '<p>This video was analyzed and no insights were found.</p>';
     } else if (loadError) {
       emptyState.innerHTML = '<p>Open <a href="#" id="open-settings">Settings</a> to configure API keys.</p>';
       const settingsLink = emptyState.querySelector('#open-settings');

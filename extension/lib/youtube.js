@@ -32,10 +32,16 @@
            document.querySelector('.html5-video-player');
   }
 
+  function getRightControls() {
+    return document.querySelector('.ytp-right-controls') ||
+           document.querySelector('.ytp-chrome-controls .ytp-right-controls');
+  }
+
   window.MediaGuardYouTube = {
     getVideoId,
     getVideoElement,
     getProgressBar,
-    getPlayerContainer
+    getPlayerContainer,
+    getRightControls
   };
 })();

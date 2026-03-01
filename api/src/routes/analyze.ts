@@ -25,6 +25,9 @@ analyzeRoutes.post("/", async (c) => {
 
   const { video_id, transcript, mistral_api_key, transcript_source } = body;
 
+  const transcriptFullText = transcript.map((t) => t.text).join(" ");
+  console.log(`[MediaGuard API] POST /analyze — video_id=${video_id}, transcript_source=${transcript_source ?? "?"}, segments=${transcript.length}, totalChars=${transcriptFullText.length}, preview=${JSON.stringify(transcriptFullText.slice(0, 150))}`);
+
   if (!video_id || !transcript || !Array.isArray(transcript)) {
     return c.json(
       { reason: "invalid_request", message: "video_id and transcript required" },
@@ -53,8 +56,20 @@ analyzeRoutes.post("/", async (c) => {
     transcript_source === "mistral" ? "mistral" :
     transcript_source === "local" ? "local" : "elevenlabs";
 
+  // Time range covered by this transcript (section or full video)
+  const analyzedStart = transcript.length > 0 ? transcript[0].start : 0;
+  const analyzedEnd = transcript.length > 0 ? transcript[transcript.length - 1].end : 0;
+
   await prisma.$transaction(async (tx) => {
-    await tx.annotation.deleteMany({ where: { videoId: video_id } });
+    // Only remove annotations that overlap with the analyzed time range.
+    // This preserves annotations from other sections when recording a specific part.
+    await tx.annotation.deleteMany({
+      where: {
+        videoId: video_id,
+        timestampStart: { lt: analyzedEnd },
+        timestampEnd: { gt: analyzedStart },
+      },
+    });
     await tx.videoAnalysis.upsert({
       where: { videoId: video_id },
       create: {

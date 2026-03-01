@@ -9,7 +9,7 @@
   const SAMPLE_RATE_16K = 16000;
   const WS_URL_ELEVENLABS = 'wss://api.elevenlabs.io/v1/speech-to-text/realtime';
   const CHUNK_SIZE = 1024;
-  const MIN_DURATION_FOR_ANALYZE = 60;
+  const MIN_DURATION_FOR_ANALYZE = 10;
 
   function float32ToPcmBase64(float32) {
     const int16 = new Int16Array(float32.length);
@@ -54,6 +54,7 @@
   }
 
   let _activeCleanup = null;
+  const LOG = (...args) => console.log('[MediaGuard]', ...args);
 
   window.MediaGuardCapture = {
     stopCapture() {
@@ -62,6 +63,7 @@
     async startCapture(options) {
       const { videoId, apiBaseUrl, mistralKey, elevenlabsKey, sttProvider, onStatus, onTranscript, onComplete, onError, onCaptureStart, videoElement } = options;
       const useMistral = sttProvider === 'mistral';
+      LOG('startCapture', { videoId, sttProvider: sttProvider || 'elevenlabs', useMistral });
 
       if (!mistralKey) {
         onError('Configure Mistral API key in extension settings.');
@@ -85,17 +87,49 @@
       let ws = null;
       const segments = [];
       let words = [];
+      let lastPartialText = '';
       let sessionStartTime = 0;
+      let videoStartTime = 0; // video.currentTime when capture started (for offsetting STT timestamps)
       let analyzeTriggered = false;
 
+      let analyzeCheckInterval = null;
+      let mistralDoneResolve = null;
+      const mistralDonePromise = useMistral
+        ? new Promise((resolve) => { mistralDoneResolve = resolve; })
+        : null;
+
       const cleanup = () => {
+        LOG('cleanup called');
         _activeCleanup = null;
-        if (processor && source) try { processor.disconnect(); source.disconnect(); } catch (_) {}
-        if (audioContext) try { audioContext.close(); } catch (_) {}
-        if (stream) stream.getTracks().forEach((t) => t.stop());
+        if (analyzeCheckInterval) {
+          clearInterval(analyzeCheckInterval);
+          analyzeCheckInterval = null;
+        }
+        if (processor && source && audioContext) {
+          try {
+            processor.disconnect();
+            source.disconnect();
+            // Firefox workaround (bug 1178751): captureStream() steals the video's AudioSink.
+            // When we stop, route the capture stream directly to speakers so audio continues.
+            source.connect(audioContext.destination);
+          } catch (_) {}
+        } else if (processor && source) {
+          try { processor.disconnect(); source.disconnect(); } catch (_) {}
+        }
+        // Do NOT close audioContext: we keep source->destination so video audio keeps playing.
+        if (stream) stream = null;
         if (ws && ws.readyState === WebSocket.OPEN) {
           if (useMistral) ws.send(JSON.stringify({ type: 'end' }));
           ws.close();
+        }
+        if (video) {
+          const wasPlaying = !video.paused;
+          const ct = video.currentTime;
+          video.pause();
+          video.currentTime = ct;
+          if (wasPlaying) {
+            setTimeout(() => { video.play().catch(() => {}); }, 0);
+          }
         }
       };
       _activeCleanup = cleanup;
@@ -124,8 +158,9 @@
           ws = new WebSocket(`${wsBase}/stt/mistral-stream?api_key=${encodeURIComponent(mistralKey)}`);
           sessionStartTime = Date.now() / 1000;
           await new Promise((resolve, reject) => {
-            ws.onopen = () => { onStatus('Mistral connected. Capturing…'); resolve(); };
-            ws.onerror = () => reject(new Error('WebSocket error'));
+            ws.onopen = () => { LOG('Mistral WebSocket open'); onStatus('Mistral connected. Capturing…'); resolve(); };
+            ws.onerror = () => { LOG('Mistral WebSocket error'); reject(new Error('WebSocket error')); };
+            ws.onclose = () => LOG('Mistral WebSocket closed');
           });
         } else {
           onStatus('Getting ElevenLabs token…');
@@ -151,8 +186,9 @@
           sessionStartTime = Date.now() / 1000;
 
           await new Promise((resolve, reject) => {
-            ws.onopen = () => { onStatus('ElevenLabs connected. Capturing…'); resolve(); };
-            ws.onerror = () => reject(new Error('WebSocket error'));
+            ws.onopen = () => { LOG('ElevenLabs WebSocket open'); onStatus('ElevenLabs connected. Capturing…'); resolve(); };
+            ws.onerror = () => { LOG('ElevenLabs WebSocket error'); reject(new Error('WebSocket error')); };
+            ws.onclose = () => LOG('ElevenLabs WebSocket closed');
           });
         }
 
@@ -165,8 +201,11 @@
         const inputRate = audioContext.sampleRate;
 
         processor.onaudioprocess = (e) => {
-          if (!ws || ws.readyState !== WebSocket.OPEN) return;
           const raw = e.inputBuffer.getChannelData(0);
+          const out = e.outputBuffer.getChannelData(0);
+          out.set(raw);
+          if (++audioChunkCount === 1) LOG('first audio chunk sent to', useMistral ? 'Mistral' : 'ElevenLabs');
+          if (!ws || ws.readyState !== WebSocket.OPEN) return;
           if (useMistral) {
             const chunk = resampleTo16k(new Float32Array(raw), inputRate);
             ws.send(JSON.stringify({ type: 'audio', data: float32ToPcmBase64(chunk) }));
@@ -181,34 +220,47 @@
           }
         };
 
+        let audioChunkCount = 0;
         ws.onmessage = (event) => {
           try {
             const msg = JSON.parse(event.data);
+            const msgType = useMistral ? msg.type : msg.message_type;
+            if (!msgType || (msgType !== 'partial' && msgType !== 'partial_transcript' && msgType !== 'committed' && msgType !== 'committed_transcript' && msgType !== 'committed_transcript_with_timestamps')) {
+              LOG('ws message', msgType || Object.keys(msg)[0], msg);
+            }
             if (useMistral) {
               switch (msg.type) {
                 case 'partial':
+                  if (msg.text !== undefined) {
+                    lastPartialText += msg.text;
+                    LOG('partial delta:', JSON.stringify(msg.text?.slice(-40)), '-> lastPartialText length:', lastPartialText.length);
+                  }
                   if (onTranscript) onTranscript({ type: 'partial', text: msg.text || '' });
                   break;
                 case 'committed':
+                  if (msg.text) {
+                    LOG('committed:', msg.text, '-> segments+', 1, 'words+', (msg.words?.length || msg.text.split(/\s+/).length));
+                    lastPartialText = '';
+                  }
                   if (msg.words && msg.words.length) {
-                    const start = msg.words[0].start ?? 0;
-                    const end = msg.words[msg.words.length - 1].end ?? start + 1;
-                    segments.push({ text: msg.text || '', start, end });
+                    const rawStart = msg.words[0].start ?? 0;
+                    const rawEnd = msg.words[msg.words.length - 1].end ?? rawStart + 1;
+                    segments.push({ text: msg.text || '', start: videoStartTime + rawStart, end: videoStartTime + rawEnd });
                     words = words.concat(msg.words.map((w) => w.text).filter(Boolean));
                   } else {
                     words = words.concat((msg.text || '').split(/\s+/).filter(Boolean));
                   }
+                  LOG('state after committed: segments=', segments.length, 'words=', words.length);
                   if (onTranscript) {
                     const w = msg.words || [];
-                    onTranscript({ type: 'committed', text: msg.text, start: w[0]?.start ?? 0, end: w[w.length - 1]?.end ?? 0, words: w });
+                    const rawStart = w[0]?.start ?? 0;
+                    const rawEnd = w[w.length - 1]?.end ?? rawStart + 1;
+                    onTranscript({ type: 'committed', text: msg.text, start: videoStartTime + rawStart, end: videoStartTime + rawEnd, words: w });
                   }
-                  const dur = segments.length ? segments[segments.length - 1].end : 0;
-                  if (dur >= MIN_DURATION_FOR_ANALYZE && !analyzeTriggered) {
-                    analyzeTriggered = true;
-                    runAnalyze();
-                  } else if (dur > 0 && dur < MIN_DURATION_FOR_ANALYZE) {
-                    onStatus(`${Math.round(dur)}s captured. Auto-analyze at 60s…`);
-                  }
+                  break;
+                case 'done':
+                  LOG('Mistral transcription.done — flush complete');
+                  if (mistralDoneResolve) { mistralDoneResolve(); mistralDoneResolve = null; }
                   break;
                 case 'error':
                   onStatus('Mistral: ' + (msg.error || 'Unknown'));
@@ -217,31 +269,40 @@
             } else {
               switch (msg.message_type) {
                 case 'partial_transcript':
+                  if (msg.text) {
+                    lastPartialText = msg.text;
+                    LOG('partial:', msg.text, '-> lastPartialText length:', lastPartialText.length);
+                  }
                   if (onTranscript) onTranscript({ type: 'partial', text: msg.text || '' });
                   break;
                 case 'committed_transcript':
+                  if (msg.text) {
+                    LOG('committed_transcript:', msg.text);
+                    lastPartialText = '';
+                  }
                   words = words.concat((msg.text || '').split(/\s+/).filter(Boolean));
+                  LOG('state after committed_transcript: words=', words.length);
                   if (onTranscript) onTranscript({ type: 'committed', text: msg.text, start: 0, end: 0, words: null });
                   break;
                 case 'committed_transcript_with_timestamps':
+                  if (msg.text) {
+                    LOG('committed_with_ts:', msg.text);
+                    lastPartialText = '';
+                  }
                   if (msg.words && msg.words.length) {
-                    const start = msg.words[0].start ?? 0;
-                    const end = msg.words[msg.words.length - 1].end ?? start + 1;
-                    segments.push({ text: msg.text || '', start, end });
+                    const rawStart = msg.words[0].start ?? 0;
+                    const rawEnd = msg.words[msg.words.length - 1].end ?? rawStart + 1;
+                    segments.push({ text: msg.text || '', start: videoStartTime + rawStart, end: videoStartTime + rawEnd });
                     words = words.concat(msg.words.map((w) => w.text).filter(Boolean));
                   } else {
                     words = words.concat((msg.text || '').split(/\s+/).filter(Boolean));
                   }
+                  LOG('state after committed_with_ts: segments=', segments.length, 'words=', words.length);
                   if (onTranscript) {
                     const w = msg.words || [];
-                    onTranscript({ type: 'committed', text: msg.text, start: w[0]?.start ?? 0, end: w[w.length - 1]?.end ?? 0, words: w });
-                  }
-                  const dur = segments.length ? segments[segments.length - 1].end : 0;
-                  if (dur >= MIN_DURATION_FOR_ANALYZE && !analyzeTriggered) {
-                    analyzeTriggered = true;
-                    runAnalyze();
-                  } else if (dur > 0 && dur < MIN_DURATION_FOR_ANALYZE) {
-                    onStatus(`${Math.round(dur)}s captured. Auto-analyze at 60s…`);
+                    const rawStart = w[0]?.start ?? 0;
+                    const rawEnd = w[w.length - 1]?.end ?? rawStart + 1;
+                    onTranscript({ type: 'committed', text: msg.text, start: videoStartTime + rawStart, end: videoStartTime + rawEnd, words: w });
                   }
                   break;
                 case 'error':
@@ -255,19 +316,43 @@
           } catch (_) {}
         };
 
-        async function runAnalyze() {
-          onStatus('1 min reached. Sending to Mistral…');
-          const transcript = segments.length > 0
-            ? segments
-            : [{ text: words.join(' '), start: 0, end: MIN_DURATION_FOR_ANALYZE }];
-          const text = transcript.map((s) => s.text).join(' ').trim();
-          if (!text) {
+        async function runAnalyze(fromStop = false) {
+          LOG('runAnalyze called', { fromStop, segments: segments.length, words: words.length, lastPartialLen: lastPartialText.length });
+          onStatus(fromStop ? 'Stopped. Sending to Mistral…' : `${MIN_DURATION_FOR_ANALYZE}s reached. Sending to Mistral…`);
+          const elapsed = sessionStartTime > 0 ? Math.max(1, (Date.now() / 1000) - sessionStartTime) : MIN_DURATION_FOR_ANALYZE;
+          const partialText = lastPartialText.trim();
+          const fromWords = words.join(' ').trim();
+          const fullText = (
+            segments.length > 0
+              ? [...segments.map((s) => s.text), partialText]
+              : [fromWords, partialText]
+          ).filter(Boolean).join(' ').trim();
+          let transcript;
+          if (segments.length > 0) {
+            transcript = segments.map((s) => ({ text: s.text, start: s.start, end: s.end }));
+            if (partialText.trim()) {
+              const lastEnd = transcript[transcript.length - 1].end;
+              transcript.push({
+                text: partialText.trim(),
+                start: lastEnd,
+                end: videoStartTime + elapsed
+              });
+            }
+          } else {
+            transcript = fullText ? [{ text: fullText, start: videoStartTime, end: videoStartTime + elapsed }] : [];
+          }
+          const firstStart = transcript.length > 0 ? transcript[0].start : 0;
+          const lastEnd = transcript.length > 0 ? transcript[transcript.length - 1].end : 0;
+          LOG('runAnalyze transcript', { videoStart: firstStart.toFixed(1), videoEnd: lastEnd.toFixed(1), segments: transcript.length, elapsed, textLen: fullText.length, textPreview: fullText.slice(0, 120) });
+          if (!fullText) {
             onStatus('No transcript yet. Keep recording…');
             analyzeTriggered = false;
             return;
           }
           try {
-            const res = await fetch(`${apiBaseUrl}/analyze`, {
+            const url = `${apiBaseUrl}/analyze`;
+            LOG('fetch POST', url);
+            const res = await fetch(url, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -281,18 +366,63 @@
               })
             });
             const data = await res.json();
+            LOG('analyze response', { status: res.status, ok: res.ok });
             if (!res.ok) throw new Error(data.reason || data.message || res.status);
-            cleanup();
-            onComplete(data);
+            if (fromStop) {
+              LOG('analyze success (stop), calling cleanup + onComplete');
+              cleanup();
+              onComplete(data);
+            } else {
+              LOG('analyze success (continue), calling onComplete without cleanup');
+              onComplete(data, { continueRecording: true });
+            }
           } catch (err) {
+            LOG('analyze error:', err.message);
             onStatus('Analysis failed: ' + (err.message || err));
             analyzeTriggered = false;
           }
         }
 
+        videoStartTime = video.currentTime;
+        LOG('capture started at video time', videoStartTime.toFixed(1));
         source.connect(processor);
         processor.connect(audioContext.destination);
-        if (typeof onCaptureStart === 'function') onCaptureStart(cleanup);
+
+        analyzeCheckInterval = setInterval(() => {
+          const elapsed = sessionStartTime > 0 ? (Date.now() / 1000) - sessionStartTime : 0;
+          const hasTranscript = segments.length > 0 || words.join(' ').trim() || lastPartialText.trim();
+          if (elapsed >= MIN_DURATION_FOR_ANALYZE && hasTranscript && !analyzeTriggered) {
+            LOG('interval: triggering runAnalyze', { elapsed: Math.round(elapsed), hasTranscript });
+            analyzeTriggered = true;
+            runAnalyze();
+          } else if (elapsed > 0 && elapsed < MIN_DURATION_FOR_ANALYZE && hasTranscript) {
+            onStatus(`${Math.round(elapsed)}s captured. Auto-analyze at ${MIN_DURATION_FOR_ANALYZE}s…`);
+            if (Math.round(elapsed) % 5 === 0) {
+              LOG('interval tick', { elapsed: Math.round(elapsed), segments: segments.length, words: words.length, lastPartialLen: lastPartialText.length });
+            }
+          }
+        }, 1000);
+
+        async function stopAndAnalyze() {
+          const hasTranscript = segments.length > 0 || words.join(' ').trim() || lastPartialText.trim();
+          LOG('stopAndAnalyze', { segments: segments.length, words: words.length, lastPartial: lastPartialText?.slice(0, 80), lastPartialLen: lastPartialText.length, hasTranscript, analyzeTriggered });
+          if (hasTranscript) {
+            if (useMistral && ws && ws.readyState === WebSocket.OPEN) {
+              onStatus('Flushing transcription…');
+              ws.send(JSON.stringify({ type: 'end' }));
+              await Promise.race([
+                mistralDonePromise || Promise.resolve(),
+                new Promise((r) => setTimeout(r, 3000))
+              ]);
+            }
+            await runAnalyze(true);
+          } else {
+            onStatus('No transcript captured. Record longer before stopping.');
+          }
+          if (_activeCleanup) cleanup();
+        }
+
+        if (typeof onCaptureStart === 'function') onCaptureStart(stopAndAnalyze);
       } catch (err) {
         cleanup();
         onError(err.message || 'Capture failed');

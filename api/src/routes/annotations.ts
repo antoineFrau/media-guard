@@ -66,7 +66,9 @@ annotationsRoutes.post("/:id/vote", async (c) => {
 
   const updated = await prisma.annotation.findUniqueOrThrow({
     where: { id },
+    include: { comments: true },
   });
+  const comments = "comments" in updated && Array.isArray(updated.comments) ? updated.comments : [];
   return c.json({
     id: updated.id,
     video_id: updated.videoId,
@@ -76,7 +78,7 @@ annotationsRoutes.post("/:id/vote", async (c) => {
     content: updated.content,
     explanation: updated.explanation,
     sources: updated.sources as string[],
-    user_comments: updated.userComments,
+    comment_count: comments.length,
     version: updated.version,
     upvotes: updated.upvotes,
     downvotes: updated.downvotes,
@@ -106,6 +108,7 @@ annotationsRoutes.get("/:videoId", async (c) => {
       const votes = "votes" in a && Array.isArray(a.votes) ? a.votes : [];
       const userVote =
         clientId && votes[0] ? (votes[0].vote as "up" | "down") : null;
+      const comments = "comments" in a && Array.isArray(a.comments) ? a.comments : [];
       return {
         id: a.id,
         video_id: a.videoId,
@@ -115,7 +118,7 @@ annotationsRoutes.get("/:videoId", async (c) => {
         content: a.content,
         explanation: a.explanation,
         sources: a.sources as string[],
-        user_comments: a.userComments,
+        comment_count: comments.length,
         version: a.version,
         upvotes: a.upvotes,
         downvotes: a.downvotes,
