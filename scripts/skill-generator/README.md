@@ -39,6 +39,8 @@ python scripts/export-semeval.py   # Creates data/semeval-export.json (50 items:
 
 ## Usage
 
+From `scripts/skill-generator/` or project root (use `npm run skill:*` from root):
+
 ```bash
 npm install
 
@@ -53,14 +55,16 @@ npm run generate:datasets  # Generate skills from multi-source definitions
 # Evaluation
 npm run evaluate                    # Eval with dataset skills (default)
 npm run evaluate -- --skills=output/skills   # Eval with YouTube skills
-npm run evaluate:benchmark         # Benchmark dataset agent on 50-item eval set (YouTube excluded)
+npm run evaluate:benchmark         # Benchmark on 50-item eval set (YouTube excluded)
 npm run evaluate:benchmark -- --limit=50 --judge   # With LLM-as-judge
 npm run evaluate:benchmark -- --include-youtube    # Include Clemovitch/YouTube agent
 
-# Langfuse Benchmark
-npm run benchmark:sync   # Sync semeval-export to Langfuse datasets (requires LANGFUSE_SECRET_KEY)
+# Langfuse Benchmark (optional)
+npm run benchmark:sync   # Sync semeval-export to Langfuse (requires LANGFUSE_SECRET_KEY)
 npm run benchmark        # Run experiment on validation dataset
 ```
+
+From project root: `npm run skill:definitions`, `npm run skill:generate:datasets`, `npm run skill:evaluate:benchmark`, etc.
 
 ## Output
 

@@ -1,34 +1,19 @@
 # MediaGuard STT App
 
-Stream audio to **ElevenLabs**, **Mistral Voxtral**, or use **Moshi** (offline WASM). For cloud providers: audio is sent to the STT service; transcription is stored as it arrives; after 1 minute, analysis is auto-sent to Mistral.
+Real-time speech-to-text for videos without captions. Streams audio to **ElevenLabs**, **Mistral Voxtral**, or **Moshi** (offline WASM). Transcript is sent to MediaGuard API for manipulation detection.
 
-## Cloud STT providers
+## Prerequisites
 
-| Provider | Key required | Notes |
-|----------|--------------|-------|
-| **ElevenLabs** | ElevenLabs API key (or server `ELEVENLABS_API_KEY`) | Direct WebSocket to ElevenLabs |
-| **Mistral Voxtral** | Mistral API key (same as for analysis) | Via MediaGuard API WebSocket proxy |
-
-## Flow (cloud providers)
-
-1. **Audio → Cloud** — Raw PCM is streamed to ElevenLabs or Mistral (Mistral uses 16kHz via API proxy).
-2. **Storage** — As transcription returns, it is stored in memory (and later sent to the API).
-3. **Auto-analyze at 1 min** — After at least 1 minute, the transcript is sent to Mistral via `POST /analyze`.
-4. **Video ID** — Paste a YouTube video ID (e.g. `7_LAiwqArvE`) to associate the analysis with that video.
-
-## Requirements
-
-- **MediaGuard API** running at `http://localhost:3000`
-- **Mistral API key** for analysis (and for Mistral Voxtral STT)
-- **ElevenLabs API key** (or server-side `ELEVENLABS_API_KEY`) for ElevenLabs STT only
-- For **Moshi** (local): Rust toolchain, `wasm32-unknown-unknown`, `wasm-bindgen-cli`
+- **MediaGuard API** running at http://localhost:3000
+- **Mistral API key** (for analysis and Mistral Voxtral STT)
+- For **Moshi** (local): Rust, `wasm32-unknown-unknown`, `wasm-bindgen-cli` — see [wasm-speech-streaming](https://github.com/lucky-bai/wasm-speech-streaming#prerequisites)
 
 ## Setup
 
 From project root:
 
 ```bash
-# Build WASM (one-time, for Moshi only)
+# Build WASM (one-time, required for Moshi; optional if using cloud STT only)
 npm run stt:build
 
 # Serve app
@@ -37,11 +22,18 @@ npm run stt:serve
 
 Open http://localhost:8000.
 
-## Usage
+## STT Providers
 
-1. Choose **ElevenLabs**, **Mistral Voxtral**, or **Local (Moshi)** provider, and **Tab audio** (to capture from a YouTube tab) or **Mic**.
-2. For Mistral Voxtral: enter your **Mistral API key** (same key used for analysis).
-3. Enter **Video ID** (optional, e.g. `7_LAiwqArvE`) so the analysis is stored for that video.
-4. Click **Start transcription** — audio streams to the selected provider; transcription appears as it arrives.
-5. After **1 minute**, analysis is automatically sent to Mistral and stored. Recording continues.
-6. Click **Stop transcription** when done. You can also click **Analyze** manually for earlier analysis.
+| Provider | Key | Notes |
+|----------|-----|-------|
+| **ElevenLabs** | ElevenLabs API key (or server `ELEVENLABS_API_KEY`) | Cloud, direct WebSocket |
+| **Mistral Voxtral** | Mistral API key | Cloud, via MediaGuard API proxy |
+| **Moshi** | None | Local WASM — fully offline, no audio leaves your machine |
+
+## Flow
+
+1. Choose provider (ElevenLabs / Mistral Voxtral / Moshi) and source (Mic / Tab audio).
+2. Click **Start transcription** — audio streams; transcript appears in real time.
+3. After **1 minute**, transcript is auto-sent to MediaGuard for analysis (`POST /analyze`).
+4. Optionally paste a **Video ID** to associate analysis with a YouTube video.
+5. Click **Stop transcription** when done. **Analyze** can be triggered manually before 1 min.

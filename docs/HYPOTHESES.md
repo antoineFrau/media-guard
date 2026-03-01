@@ -6,7 +6,7 @@ This document formulates research questions in the style of a scientific paper. 
 
 ## Abstract
 
-MediaGuard uses large language models (LLMs) to detect rhetorical manipulation techniques in video transcripts and news text. We propose five testable hypotheses concerning (1) the impact of dataset-backed skill definitions on detection accuracy, (2) the benefits of taxonomy alignment, (3) the effect of few-shot examples in skills, (4) cross-domain generalization, and (5) the monotonicity of adding techniques. Evaluation is performed on the SemEval-2020 Task 11 Propaganda Techniques Corpus.
+MediaGuard uses large language models (LLMs) to detect rhetorical manipulation techniques in video transcripts and news text. We propose five testable hypotheses concerning (1) the impact of dataset-backed skill definitions on detection accuracy, (2) the benefits of taxonomy alignment, (3) the effect of few-shot examples in skills, (4) cross-domain generalization, and (5) the monotonicity of adding techniques. Evaluation is performed on a 50-item curated evaluation set (PRTA samples + SemEval-style + propaganda literature); see [docs/CONCLUSION.md](CONCLUSION.md) and [docs/DATASETS.md](DATASETS.md).
 
 ---
 
@@ -94,23 +94,23 @@ MediaGuard uses large language models (LLMs) to detect rhetorical manipulation t
 
 ## Evaluation Protocol
 
-1. **Dataset**: SemEval-2020 Task 11 validation split (75 articles).
+1. **Dataset**: 50-item curated evaluation set (PRTA samples + curated SemEval-style + propaganda literature). Export via `python3 scripts/skill-generator/scripts/export-semeval.py`.
 2. **Pseudo-transcript**: Convert article text to transcript format with fake timestamps (sentence-level segments).
 3. **Analyzer**: Mistral API with skills context; returns `alerts` with `quote`, `technique`, `start`, `end`.
 4. **Matching**: Gold span (start_char, end_char, technique_id) matches prediction if:
    - Predicted `quote` overlaps with gold span (character-level).
    - Predicted `technique` maps to same gold technique (via slug mapping).
-5. **Metrics**: Precision, Recall, F1 (micro and macro); per-technique F1.
+5. **Metrics**: Precision, Recall, F1 (micro and macro); per-technique F1. LLM-as-judge optional for semantic correctness.
 
 ---
 
 ## Results
 
-Evaluation run on 2026-03-01. See `docs/CONCLUSION.md` for the full 50-item benchmark.
+Evaluation run on 2026-03-01. See `docs/CONCLUSION.md` for the full 50-item benchmark and methodology.
 
 | Hypothesis | Metric | Expected | Actual | Supported? |
 |------------|--------|----------|--------|------------|
-| H1 | Macro-F1 (dataset vs YouTube skills) | Dataset > YouTube | Dataset: 80%, YouTube: 0% | Yes |
+| H1 | Span F1 (dataset vs YouTube skills) | Dataset > YouTube | Dataset: 64.2%, YouTube: 0% | Yes |
 | H2 | Per-technique recall (aligned vs ad-hoc) | Aligned > Ad-hoc | YouTube skills use FR slugs (appel-a-la-peur, etc.) → 0% recall on SemEval gold | Yes |
 | H3 | Macro-F1 (with vs without examples) | With examples > Without | Not yet tested | — |
 | H4 | Macro-F1 on custom eval set | > 0.5 | Requires manual annotation | — |
@@ -118,5 +118,5 @@ Evaluation run on 2026-03-01. See `docs/CONCLUSION.md` for the full 50-item benc
 
 ### Summary
 
-- **H1 (Skill Quality)**: Dataset-backed skills achieved 80% F1 vs 0% for YouTube-derived skills on the same eval set. Strong support.
+- **H1 (Skill Quality)**: Dataset-backed skills achieved **64.2% span F1** (70.0% LLM judge) vs 0% for YouTube-derived skills on the same 50-item eval set. Strong support.
 - **H2 (Taxonomy Alignment)**: YouTube skills use French/ad-hoc slugs that do not match SemEval gold labels; the analyzer outputs technique names that fail to map to gold. Dataset skills use exact SemEval slugs. Supports the hypothesis that alignment improves recall.

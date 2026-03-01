@@ -52,16 +52,23 @@ Backend for MediaGuard: video analysis (manipulation + fact-check detection), an
 ## Quick Start
 
 ```bash
-# 1. Start PostgreSQL (and optionally Langfuse for tracing)
+# 1. Install dependencies
+npm install
+
+# 2. Create environment file
+cp .env.example .env
+# Edit .env: set DATABASE_URL (default works with Docker), optionally MISTRAL_API_KEY
+
+# 3. Start PostgreSQL (and optionally Langfuse for tracing)
 docker compose up -d
 
-# 2. Run migrations
+# 4. Run migrations
 npm run db:migrate
 
-# 3. Seed fake data
+# 5. Seed fake data
 npm run db:seed
 
-# 4. Start API
+# 6. Start API
 npm run api:dev
 ```
 
@@ -78,15 +85,18 @@ API runs at `http://localhost:3000`.
 
 ## Environment
 
-Create `.env` in project root:
+Create `.env` in project root (see `.env.example` for template):
 
-```
-DATABASE_URL="postgresql://mediaguard:mediaguard@localhost:5432/mediaguard"
-```
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection. Default: `postgresql://mediaguard:mediaguard@localhost:5432/mediaguard` |
+| `MISTRAL_API_KEY` | No* | For server-side analysis. Otherwise send `X-Mistral-API-Key` header per request (BYOK). |
+| `ELEVENLABS_API_KEY` | No | For ElevenLabs STT when client doesn't provide key |
+| `LANGFUSE_SECRET_KEY` | No | For LLM tracing. Get from Langfuse UI after first login |
+| `LANGFUSE_PUBLIC_KEY` | No | Optional, for client-side |
+| `LANGFUSE_BASE_URL` | No | Default: `http://localhost:3100` (self-hosted via docker compose) |
 
-Optional: `MISTRAL_API_KEY` for server-side analysis. Otherwise send `X-Mistral-API-Key` header per request (BYOK).
-
-For Langfuse tracing: `LANGFUSE_SECRET_KEY` (and optionally `LANGFUSE_PUBLIC_KEY`). When set, each `/analyze` and `/video/:id/analysis` request is traced with Mistral generations. Run `docker compose up -d` to start self-hosted Langfuse at http://localhost:3100.
+\* API works with BYOK; some features (e.g. server-side analysis, STT proxy) require a key.
 
 ## Seeded Data
 
@@ -132,11 +142,40 @@ npm run skill:generate -- --fetch-only --last=2   # Test YouTube fetch without M
 
 Standalone web app for real-time speech-to-text. Options: **ElevenLabs** (cloud), **Mistral Voxtral** (cloud via API proxy), or **Moshi** (offline WASM). Captures mic or tab audio, transcribes in real time, then sends to MediaGuard API for analysis.
 
-**Prerequisites:** Rust, `wasm32-unknown-unknown`, `wasm-bindgen-cli` (see [wasm-speech-streaming](https://github.com/lucky-bai/wasm-speech-streaming#prerequisites)).
+**Prerequisites:**
+- For **Moshi** (local): Rust, `wasm32-unknown-unknown`, `wasm-bindgen-cli` — see [wasm-speech-streaming](https://github.com/lucky-bai/wasm-speech-streaming#prerequisites)
+- `libs/wasm-speech-streaming` must exist (clone or add as submodule from https://github.com/lucky-bai/wasm-speech-streaming)
 
 ```bash
-npm run stt:build    # Build WASM (one-time, requires Rust)
+npm run stt:build    # Build WASM (one-time, for Moshi; requires Rust)
 npm run stt:serve    # Serve at http://localhost:8000
 ```
 
 Open http://localhost:8000. Choose Mic or Tab audio, start transcription, then click **Analyze with MediaGuard** to detect manipulation techniques. Requires Mistral API key and API running at http://localhost:3000.
+
+---
+
+## Reproducibility (Evaluation & Benchmark)
+
+To reproduce the evaluation and benchmark results from [docs/CONCLUSION.md](docs/CONCLUSION.md):
+
+```bash
+# 1. Export 50-item evaluation dataset (Python 3 required)
+cd scripts/skill-generator && python3 scripts/export-semeval.py
+cd ../..   # Back to project root
+
+# 2. Set MISTRAL_API_KEY (in scripts/skill-generator/.env or root .env)
+cp scripts/skill-generator/.env.example scripts/skill-generator/.env
+# Edit scripts/skill-generator/.env and add MISTRAL_API_KEY=your_key
+
+# 3. Build technique definitions (PRTA + SemEval + PropaInsight)
+npm run skill:definitions
+
+# 4. Generate dataset-backed skills
+npm run skill:generate:datasets
+
+# 5. Run benchmark (50 items, with LLM-as-judge)
+npm run skill:evaluate:benchmark -- --limit=50 --judge
+```
+
+Expected results: **64.2% span F1**, **70.0% LLM judge score**. See [docs/CONCLUSION.md](docs/CONCLUSION.md) for full methodology and [docs/HYPOTHESES.md](docs/HYPOTHESES.md) for research hypotheses.

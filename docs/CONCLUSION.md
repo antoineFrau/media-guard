@@ -140,19 +140,29 @@ We have established a 50-item evaluation set with gold-annotated spans drawn fro
 
 ## Appendix A: Commands
 
-```bash
-# Export 50-item dataset
-cd scripts/skill-generator && python3 scripts/export-semeval.py
+From project root:
 
-# Run benchmark (50 items, dataset-only, with LLM judge)
-npm run evaluate:benchmark -- --limit=50 --judge
+```bash
+# 1. Export 50-item dataset
+cd scripts/skill-generator && python3 scripts/export-semeval.py   # creates data/semeval-export.json
+
+# 2. Build technique definitions (PRTA + SemEval + PropaInsight)
+npm run skill:definitions
+
+# 3. Generate dataset-backed skills
+npm run skill:generate:datasets
+
+# 4. Run benchmark (50 items, dataset-only, with LLM judge)
+npm run skill:evaluate:benchmark -- --limit=50 --judge
 
 # Include YouTube agent (optional)
-npm run evaluate:benchmark -- --limit=50 --judge --include-youtube
+npm run skill:evaluate:benchmark -- --limit=50 --judge --include-youtube
 
 # Run evaluation for dataset skills only (validation split)
-npm run evaluate -- --skills=output/skills-dataset
+npm run skill:evaluate -- --skills=output/skills-dataset
 ```
+
+Requires `MISTRAL_API_KEY` in `scripts/skill-generator/.env` or project root `.env`.
 
 ## Appendix B: Output Files
 
