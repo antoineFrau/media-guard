@@ -1,46 +1,180 @@
 const storage = typeof browser !== 'undefined' ? browser.storage : chrome.storage;
-const STORAGE_KEYS = { mistralKey: 'mistral_api_key', apiBaseUrl: 'api_base_url', elevenlabsKey: 'elevenlabs_api_key', sttProvider: 'stt_provider' };
-const DEFAULT_API_URL = 'http://localhost:3000';
+const runtime = typeof browser !== 'undefined' ? browser.runtime : chrome.runtime;
+const tabs = typeof browser !== 'undefined' ? browser.tabs : chrome.tabs;
 
-document.addEventListener('DOMContentLoaded', () => {
-  const mistralInput = document.getElementById('mistral-key');
-  const apiUrlInput = document.getElementById('api-url');
-  const elevenlabsInput = document.getElementById('elevenlabs-key');
-  const saveBtn = document.getElementById('save-btn');
-  const statusEl = document.getElementById('status');
+const YOUTUBE_WATCH = /^https?:\/\/(www\.)?youtube\.com\/watch/i;
 
-  storage.local.get([STORAGE_KEYS.mistralKey, STORAGE_KEYS.apiBaseUrl, STORAGE_KEYS.elevenlabsKey, STORAGE_KEYS.sttProvider]).then((data) => {
-    if (data[STORAGE_KEYS.mistralKey]) mistralInput.value = data[STORAGE_KEYS.mistralKey];
-    if (data[STORAGE_KEYS.apiBaseUrl]) {
-      apiUrlInput.value = data[STORAGE_KEYS.apiBaseUrl];
-    } else {
-      apiUrlInput.placeholder = DEFAULT_API_URL;
-    }
-    if (data[STORAGE_KEYS.elevenlabsKey]) elevenlabsInput.value = data[STORAGE_KEYS.elevenlabsKey];
-    const provider = data[STORAGE_KEYS.sttProvider] || 'elevenlabs';
-    document.querySelectorAll('input[name="stt-provider"]').forEach((el) => {
-      el.checked = el.value === provider;
-    });
-  });
+function show(el) {
+  el.classList.remove('hidden');
+}
+function hide(el) {
+  el.classList.add('hidden');
+}
 
-  saveBtn.addEventListener('click', () => {
-    const mistralKey = mistralInput.value.trim();
-    const apiUrl = apiUrlInput.value.trim();
-    const elevenlabsKey = elevenlabsInput.value.trim();
-    const sttProvider = document.querySelector('input[name="stt-provider"]:checked')?.value || 'elevenlabs';
+function openSettings() {
+  runtime.openOptionsPage?.();
+  window.close();
+}
 
-    storage.local.set({
-      [STORAGE_KEYS.mistralKey]: mistralKey || '',
-      [STORAGE_KEYS.apiBaseUrl]: apiUrl || '',
-      [STORAGE_KEYS.elevenlabsKey]: elevenlabsKey || '',
-      [STORAGE_KEYS.sttProvider]: sttProvider
-    }).then(() => {
-      statusEl.textContent = 'Saved';
-      statusEl.className = 'status success';
-      setTimeout(() => { statusEl.textContent = ''; }, 2000);
-    }).catch((err) => {
-      statusEl.textContent = 'Error: ' + err.message;
-      statusEl.className = 'status error';
-    });
-  });
+document.getElementById('settings-link').addEventListener('click', (e) => {
+  e.preventDefault();
+  openSettings();
 });
+
+async function init() {
+  const notYoutube = document.getElementById('not-youtube');
+  const youtubePanel = document.getElementById('youtube-panel');
+  const loading = document.getElementById('loading');
+
+  try {
+    const [tab] = await tabs.query({ active: true, currentWindow: true });
+    if (!tab || !tab.id) {
+      show(notYoutube);
+      hide(youtubePanel);
+      hide(loading);
+      return;
+    }
+
+    const isYouTube = tab.url && YOUTUBE_WATCH.test(tab.url);
+    if (!isYouTube) {
+      show(notYoutube);
+      hide(youtubePanel);
+      hide(loading);
+      return;
+    }
+
+    hide(notYoutube);
+    show(youtubePanel);
+    hide(loading);
+
+    let state;
+    try {
+      state = await tabs.sendMessage(tab.id, { action: 'getVideoState' });
+    } catch (err) {
+      // Content script may not be ready
+      state = { error: 'Content script not ready. Refresh the page.' };
+    }
+
+    renderYouTubePanel(state, tab.id);
+  } catch (err) {
+    show(notYoutube);
+    hide(youtubePanel);
+    hide(loading);
+  }
+}
+
+function renderYouTubePanel(state, tabId) {
+  const videoStatus = document.getElementById('video-status');
+  const captureSection = document.getElementById('capture-section');
+  const analysisSection = document.getElementById('analysis-section');
+  const issuesList = document.getElementById('issues-list');
+  const emptyState = document.getElementById('empty-state');
+  const captureBtn = document.getElementById('capture-btn');
+
+  videoStatus.innerHTML = '';
+
+  if (state.error) {
+    videoStatus.textContent = state.error;
+    videoStatus.className = 'status-area error';
+    hide(captureSection);
+    hide(analysisSection);
+    show(emptyState);
+    return;
+  }
+
+  const { videoId, analysisData, isLoading, loadError, segments } = state;
+
+  if (isLoading) {
+    videoStatus.textContent = 'Loading analysis…';
+    videoStatus.className = 'status-area';
+    hide(captureSection);
+    hide(analysisSection);
+    hide(emptyState);
+    return;
+  }
+
+  if (loadError) {
+    videoStatus.textContent = loadError;
+    videoStatus.className = 'status-area error';
+  }
+
+  const hasAnalysis = analysisData && (analysisData.alerts?.length > 0 || analysisData.fact_checks?.length > 0);
+  const needsCapture = loadError === 'no_transcript';
+
+  if (hasAnalysis && segments && segments.length > 0) {
+    videoStatus.innerHTML = `<strong>${segments.length}</strong> issue(s) found`;
+    videoStatus.className = 'status-area success';
+    show(analysisSection);
+    hide(captureSection);
+    hide(emptyState);
+
+    issuesList.innerHTML = '';
+    segments.forEach((seg, idx) => {
+      const item = document.createElement('div');
+      item.className = `issue-item ${seg.type}`;
+      const label = seg.type === 'manipulation' ? (seg.data.technique || 'Manipulation') : (seg.data.claim || 'Fact check');
+      const timeStr = formatTime(seg.start);
+      item.innerHTML = `
+        <div class="issue-header">
+          <span class="issue-type">${seg.type === 'manipulation' ? '⚠' : '✓'} ${seg.type === 'manipulation' ? 'Manipulation' : 'Fact check'}</span>
+          <button class="seek-btn" data-time="${seg.start}" data-idx="${idx}">Go to ${timeStr}</button>
+        </div>
+        <div class="issue-label">${truncate(label, 80)}</div>
+      `;
+      const seekBtn = item.querySelector('.seek-btn');
+      seekBtn.addEventListener('click', () => {
+        tabs.sendMessage(tabId, { action: 'seekTo', time: seg.start });
+        window.close();
+      });
+      issuesList.appendChild(item);
+    });
+  } else if (needsCapture) {
+    show(captureSection);
+    hide(analysisSection);
+    hide(emptyState);
+    captureBtn.onclick = () => {
+      tabs.sendMessage(tabId, { action: 'startCapture' });
+      window.close();
+    };
+  } else {
+    hide(captureSection);
+    hide(analysisSection);
+    show(emptyState);
+    if (analysisData && !hasAnalysis) {
+      videoStatus.textContent = 'No issues detected';
+      videoStatus.className = 'status-area success';
+      emptyState.innerHTML = '<p>This video was analyzed and no issues were found.</p>';
+    } else if (loadError) {
+      emptyState.innerHTML = '<p>Open <a href="#" id="open-settings">Settings</a> to configure API keys.</p>';
+      const settingsLink = emptyState.querySelector('#open-settings');
+      if (settingsLink) {
+        settingsLink.addEventListener('click', (e) => { e.preventDefault(); openSettings(); });
+      }
+    } else {
+      videoStatus.textContent = 'Ready';
+      videoStatus.className = 'status-area';
+      emptyState.innerHTML = '<p>Analysis loads automatically. Use capture audio if the video has no captions.</p><button id="empty-capture-btn" class="capture-btn">Capture audio</button>';
+      const emptyCaptureBtn = emptyState.querySelector('#empty-capture-btn');
+      if (emptyCaptureBtn) {
+        emptyCaptureBtn.addEventListener('click', () => {
+          tabs.sendMessage(tabId, { action: 'startCapture' });
+          window.close();
+        });
+      }
+    }
+  }
+}
+
+function formatTime(seconds) {
+  if (typeof seconds !== 'number' || seconds < 0) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function truncate(str, len) {
+  if (!str) return '';
+  return str.length <= len ? str : str.slice(0, len) + '…';
+}
+
+init();

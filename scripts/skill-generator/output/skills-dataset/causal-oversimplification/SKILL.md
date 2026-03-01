@@ -1,22 +1,28 @@
 ```yaml
 ---
 name: causal-oversimplification
-description: "Causal oversimplification (FR: Fausse causalité) is a manipulation technique that reduces a complex cause-effect relationship to a single cause, oversimplifying why something happened. Trigger terms in English include 'if...then', 'because', 'since', and in French 'si...alors', 'parce que', 'puisque'. This technique can mislead by ignoring multiple factors or nuanced relationships, presenting a simplified and often misleading narrative."
+description: "Causal oversimplification (FR: Fausse causalité) is a manipulation technique that reduces complex cause-effect relationships to a single, often oversimplified cause. This technique is used to assign blame, create a simple narrative, or scapegoat a particular group or action. It evokes appeals of understanding, closure, and a simple narrative, often with the intent to oversimplify causation or assign blame. Trigger terms in English include 'simple,' 'just,' 'only,' and 'because,' while in French they include 'simple,' 'juste,' 'seulement,' and 'parce que.'"
 ---
 ## What it is
-Causal oversimplification (FR: Fausse causalité) is a manipulation technique that reduces a complex cause-effect relationship to a single cause, oversimplifying why something happened. This technique can mislead by ignoring multiple factors or nuanced relationships, presenting a simplified and often misleading narrative.
+Causal oversimplification is a manipulation technique that reduces complex cause-effect relationships to a single, often oversimplified cause. This technique is used to assign blame, create a simple narrative, or scapegoat a particular group or action. It evokes appeals of understanding, closure, and a simple narrative, often with the intent to oversimplify causation or assign blame.
 
 ## How to recognize it
-- Look for statements that attribute a single cause to a complex event.
-- Identify trigger terms such as 'if...then', 'because', 'since' in English and 'si...alors', 'parce que', 'puisque' in French.
-- Check if the statement ignores other contributing factors or context.
+Causal oversimplification can be recognized by the following cues:
+- **Appeals evoked:** Understanding, closure, simple narrative
+- **Author intent:** Assign blame, oversimplify causation, scapegoat
+- **Trigger terms (English):** "simple," "just," "only," "because"
+- **Trigger terms (French):** "simple," "juste," "seulement," "parce que"
+- **Contextual cues:** The text reduces a complex issue to a single cause, often ignoring other contributing factors. It may use definitive language to assert a direct cause-effect relationship without sufficient evidence.
 
 ## Examples
-- "If France had not declared war on Germany, World War II would have never happened."
-- "The economy improved because the new policy was implemented, ignoring other economic factors."
+- "If France had not declared war on Germany then World War II would have never happened."
+- "Video games cause violence. It's simple. Every mass shooter played them."
+- "Close the borders and the economy will recover overnight."
+- "Unemployment rose because taxes were too high. Cut taxes and jobs will return."
 
 ## Research backing
 - PRTA (ACL 2020)
 - SemEval-2020 Task 11
 - SemEval PTC
+- PropaInsight (COLING 2025)
 ```

@@ -1,20 +1,24 @@
 ```yaml
 ---
 name: "exaggeration-minimisation"
-description: "Exaggeration/Minimisation (FR: Exagération / Minimisation) is a manipulation technique where the importance or severity of something is either exaggerated or downplayed. This can involve inflating threats or downplaying harms, often to sway public opinion or perception. Trigger terms in English include 'very low', 'minimal', 'catastrophic', 'disastrous', while in French they might be 'très faible', 'minime', 'catastrophique', 'désastreux'."
+description: "Exaggeration/Minimisation (FR: Exagération / Minimisation) is a manipulation technique that involves either inflating the importance or severity of something (exaggeration) or downplaying it (minimisation). This technique can be used to amplify threats or downplay harms, often to control the framing of severity. Trigger terms in English include 'greatest,' 'nothing more than,' 'minor,' and 'hardly worth mentioning.' In French, similar terms are 'le plus grand,' 'rien de plus qu,' 'mineur,' and 'à peine la peine.'"
 ---
+
 ## What it is
-Exaggeration/Minimisation is a manipulation technique that involves either amplifying or diminishing the significance of an event, statement, or situation. This technique is often used to influence public perception, sway opinions, or justify actions by presenting a skewed view of reality.
+Exaggeration/Minimisation (FR: Exagération / Minimisation) is a manipulation technique that involves either inflating the importance or severity of something (exaggeration) or downplaying it (minimisation). This technique can be used to amplify threats or downplay harms, often to control the framing of severity. It is bidirectional, meaning it can be used to inflate the enemy or risk or shrink one's own responsibility.
 
 ## How to recognize it
-- **Exaggeration**: Look for language that amplifies the importance or severity of something, often using terms like "catastrophic," "disastrous," or "very low" in a context where the actual impact is minimal.
-- **Minimisation**: Identify instances where the severity or importance of an issue is downplayed, using terms like "minimal," "not significant," or "very low" to diminish the impact.
-- **Contextual Inconsistency**: Compare the language used with the actual facts or evidence presented to see if there is a discrepancy.
+Exaggeration/Minimisation can be recognized by the use of extreme language to either inflate or downplay the significance of an event, action, or situation. For exaggeration, look for terms that evoke alarm, such as "greatest," "catastrophic," or "unprecedented." For minimisation, look for terms that evoke reassurance, such as "minor," "small," or "hardly worth mentioning." The intent behind this technique is often to amplify threat or downplay harm, controlling the framing of severity.
 
 ## Examples
-- "Coronavirus 'risk to the American people remains very low', Trump said." (Minimisation)
-- "The economic impact of the policy will be catastrophic." (Exaggeration)
+- "Coronavirus 'risk to the American people remains very low', Trump said."
+- "The so-called crisis is nothing more than a minor inconvenience"
+- "This is the greatest scandal in American history"
+- "It was merely a small oversight. Hardly worth mentioning"
 
 ## Research backing
-- Method of semantic features estimation for political propaganda techniques detection using transformer neural networks (2024): This research explores the use of transformer neural networks to detect various propaganda techniques, including exaggeration and minimisation, by analyzing semantic features in text. [URL](https://www.semanticscholar.org/paper/3d9fa5e590b5e27ad274a5f91edd3289d94e6ed9)
+- PRTA (ACL 2020)
+- SemEval-2020 Task 11
+- SemEval PTC
+- PropaInsight (COLING 2025)
 ```

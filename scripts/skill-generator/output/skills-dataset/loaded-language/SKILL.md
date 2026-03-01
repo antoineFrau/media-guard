@@ -1,23 +1,30 @@
 ```yaml
 ---
 name: "loaded-language"
-description: "Loaded language (FR: Langage chargé) is a manipulation technique that involves using words with strong emotional connotations to influence perception. This slanted vocabulary triggers emotional responses, often to sway public opinion or create a biased view of a situation. Trigger terms in English include 'outrage,' 'shocking,' 'appalling,' 'disgusting,' and 'horrifying.' In French, similar terms are 'indignation,' 'choquant,' 'répugnant,' 'dégoûtant,' and 'horrifiant.' This technique is commonly found in news headlines, political discourse, and social media posts, where emotional language can quickly shape public perception."
+description: "Loaded language (FR: Langage chargé) involves using words with strong emotional connotations to influence perception. This technique employs slanted vocabulary that triggers emotional responses, shaping perception through word choice and evoking affective reactions. It is a core manipulation technique where vocabulary is used as a persuasion tool, often blurring the lines between emotive language and systematic slant. Recognizing loaded language requires identifying emotionally charged terms, moral judgments, and valence shifts in discourse."
 ---
 ## What it is
-Loaded language (FR: Langage chargé) is the use of emotionally charged words to influence how an audience perceives information. This technique leverages the power of language to evoke strong feelings, often to manipulate public opinion or create a biased narrative.
+Loaded language (FR: Langage chargé) is a manipulation technique that uses words with strong emotional connotations to influence perception. It involves slanted vocabulary that triggers emotional responses, shaping perception through word choice and evoking affective reactions. This technique is a core method of persuasion where vocabulary is used strategically to manipulate emotions and judgments.
 
 ## How to recognize it
-1. **Emotional Triggers**: Look for words that evoke strong emotions such as 'outrage,' 'shocking,' 'appalling,' 'disgusting,' or 'horrifying' in English, and 'indignation,' 'choquant,' 'répugnant,' 'dégoûtant,' or 'horrifiant' in French.
-2. **Contextual Analysis**: Assess whether the emotional language is proportional to the context or if it is being used to exaggerate or manipulate the perception of an event.
-3. **Repetition**: Notice if the same emotionally charged words are repeated to reinforce a particular emotional response.
+Loaded language can be recognized by the use of emotionally charged terms that evoke strong feelings such as outrage, fear, or moral judgment. Look for words that carry a strong valence, either positive or negative, and that are used to shape perception. The intent behind loaded language is often to trigger an affective response and to influence the audience's perception through carefully chosen words. Common trigger terms in English include "brutal," "radical," "ruthless," and "slaughtered," while in French, terms like "sauvage," "extrémiste," "impitoyable," and "massacre" are often used.
 
 ## Examples
 - "Outrage as Donald Trump suggests injecting disinfectant to kill virus."
-- "Shocking revelations about the government's secret dealings."
-- "Appalling behavior from the opposition party during the debate."
+- "The brutal regime cracked down on protesters."
+- "Radical extremists hijacked the peaceful movement. Violent mobs destroyed our cities."
+- "The ruthless dictator crushed the uprising. Innocent civilians were slaughtered."
 
 ## Research backing
-- **PRTA (ACL 2020)**: This paper discusses the use of emotionally charged language in political discourse and its impact on public perception.
-- **SemEval-2020 Task 11**: This task focuses on identifying propaganda techniques, including loaded language, in text data.
-- **SemEval PTC**: The SemEval Propaganda Techniques Corpus provides annotated examples of loaded language and other manipulation techniques in news articles and social media posts.
+1. **The Performativity of Weaponized Language: Manipulation, Power, and Resistance (2025)**
+   - Explores how language is used strategically to influence perceptions, emotions, and behavior, often undermining democratic values and societal cohesion. This study builds on theories of speech acts and examines how language's performative nature is exploited to reshape realities and disrupt public trust.
+   - URL: [https://www.semanticscholar.org/paper/00b1be8ed17f79eace846a638258f96b549005a7](https://www.semanticscholar.org/paper/00b1be8ed17f79eace846a638258f96b549005a7)
+
+2. **Crisis and Risk Communication or Propaganda and Disinformation: Rhetorical Strategies That Blur the Lines between Strategy and Manipulation (2025)**
+   - Analyzes the convergence between classical rhetorical strategies and propagandistic or deceptive discourse. It highlights how corporate apology rhetoric can function as a coercive communication approach, limiting audiences' interpretive agency and obstructing reflexive judgment.
+   - URL: [https://www.semanticscholar.org/paper/6061526043a7fa8d59418c66db76e17fc330f6c4](https://www.semanticscholar.org/paper/6061526043a7fa8d59418c66db76e17fc330f6c4)
+
+3. **Trump’s Rhetoric on Social Networks and the Dominance of Computerized Propaganda (2022)**
+   - Investigates the use of social networks for political propaganda, focusing on Donald Trump's rhetoric. The analysis shows that Trump's rhetoric was based on insults, criticism, inappropriate vocabulary, and lies to achieve dominance over opponents.
+   - URL: [https://www.semanticscholar.org/paper/fab977d0fa5e2f7d3b4bbcda3906093f08a1d334](https://www.semanticscholar.org/paper/fab977d0fa5e2f7d3b4bbcda3906093f08a1d334)
 ```

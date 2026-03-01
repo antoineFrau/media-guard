@@ -38,8 +38,23 @@ model Annotation {
   updatedAt     DateTime @updatedAt
 
   comments AnnotationComment[]
+  votes    AnnotationVote[]
 
   @@index([videoId])
+}
+
+model AnnotationVote {
+  id           String   @id @default(uuid())
+  annotationId String
+  clientId     String
+  vote         String   // "up" | "down"
+  createdAt    DateTime @default(now())
+
+  annotation Annotation @relation(fields: [annotationId], references: [id], onDelete: Cascade)
+
+  @@unique([annotationId, clientId])
+  @@index([annotationId])
+  @@index([clientId])
 }
 
 enum AnnotationType {

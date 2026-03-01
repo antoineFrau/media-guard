@@ -16,6 +16,7 @@
     "skill:generate": "cd scripts/skill-generator && tsx src/index.ts",
     "stt:build": "./scripts/build-stt.sh",
     "stt:serve": "python scripts/serve-stt.py",
+    "extension:icons": "./scripts/generate-extension-icons.sh",
     "skill:generate:datasets": "cd scripts/skill-generator && tsx src/generate-from-datasets.ts",
     "skill:evaluate": "cd scripts/skill-generator && tsx src/evaluate.ts",
     "skill:benchmark": "cd scripts/skill-generator && tsx src/benchmark.ts",

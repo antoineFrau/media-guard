@@ -9,6 +9,14 @@ import { SEMEVAL_TO_SLUG, SLUG_TO_NAME } from "./technique-mapping.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+/** PropaInsight-style supplement (appeals, intent, confusions). */
+export interface PropaInsightSupplement {
+  appeals: string[];
+  intent: string[];
+  commonConfusions?: string;
+  propaInsightNote?: string;
+}
+
 export interface TechniqueDefinition {
   slug: string;
   name: string;
@@ -17,6 +25,8 @@ export interface TechniqueDefinition {
   example?: string;
   examples?: string[];
   sources: string[];
+  /** PropaInsight appeals/intent (multi-source enrichment) */
+  propaInsight?: PropaInsightSupplement;
 }
 
 export interface TechniqueDefinitionsDb {
@@ -101,6 +111,36 @@ function mergeExamples(
 }
 
 /**
+ * Load PropaInsight supplement (appeals, intent, confusions) for multi-source enrichment.
+ */
+async function loadPropaInsightSupplement(): Promise<Record<string, PropaInsightSupplement> | null> {
+  const path = join(__dirname, "..", "data", "propainsight-supplement.json");
+  try {
+    const content = await readFile(path, "utf-8");
+    const data = JSON.parse(content) as { supplements?: Record<string, PropaInsightSupplement> };
+    return data.supplements ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Merge PropaInsight supplements into technique definitions.
+ */
+function mergePropaInsight(
+  definitions: TechniqueDefinition[],
+  supplement: Record<string, PropaInsightSupplement> | null
+): TechniqueDefinition[] {
+  if (!supplement) return definitions;
+
+  return definitions.map((d) => {
+    const s = supplement[d.slug];
+    if (!s) return d;
+    return { ...d, propaInsight: s, sources: [...new Set([...d.sources, "PropaInsight (COLING 2025)"])] };
+  });
+}
+
+/**
  * Ensure all 14 SemEval techniques are present (in case static is incomplete).
  */
 function ensureComplete(definitions: TechniqueDefinition[]): TechniqueDefinition[] {
@@ -135,7 +175,9 @@ export async function loadTechniqueDefinitions(
   }
 
   const merged = mergeExamples(definitions, semeval);
-  const complete = ensureComplete(merged);
+  const propaInsight = await loadPropaInsightSupplement();
+  const withPropa = mergePropaInsight(merged, propaInsight);
+  const complete = ensureComplete(withPropa);
 
   const db: TechniqueDefinitionsDb = {
     generatedAt: new Date().toISOString(),

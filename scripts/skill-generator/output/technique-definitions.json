@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-01T00:01:26.643Z",
+  "generatedAt": "2026-03-01T17:33:33.830Z",
   "techniques": [
     {
       "slug": "appeal-to-authority",
@@ -9,13 +9,33 @@
       "example": "Monsignor Jean-François Lantheaume, who served as first Counsellor of the Nunciature in Washington, confirmed that \"Vigano said the truth. That's all.\"",
       "examples": [
         "Monsignor Jean-François Lantheaume, who served as first Counsellor of the Nunciature in Washington, confirmed that \"Vigano said the truth. That's all.\"",
-        "Monsignor Jean-François Lantheaume, who served as first Counsellor of the Nunciature in Washington, confirmed that \"Vigano said the truth. That's all.\""
+        "Monsignor Jean-François Lantheaume, who served as first Counsellor of the Nunciature in Washington, confirmed that \"Vigano said the truth. That's all.\"",
+        "Dr. Smith, a renowned epidemiologist from Harvard, stated that the vaccine is completely safe",
+        "According to senior intelligence officials, the threat level has never been higher",
+        "Expert Dr. Jane Wilson warns of catastrophe",
+        "Renowned economist Paul Krugman explains why inflation is transitory. Nobel laureates agree"
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "credibility",
+          "trust",
+          "expertise"
+        ],
+        "intent": [
+          "persuade by association",
+          "lend legitimacy"
+        ],
+        "commonConfusions": [
+          "Not all expert citations are propaganda; distinguish authoritative sourcing from name-dropping"
+        ],
+        "propaInsightNote": "Often overlaps with glittering generalities when the authority is idealized."
+      }
     },
     {
       "slug": "appeal-to-fear-prejudice",
@@ -25,13 +45,35 @@
       "example": "A dark, impenetrable and \"irreversible\" winter of persecution of the faithful by their own shepherds will fall.",
       "examples": [
         "A dark, impenetrable and \"irreversible\" winter of persecution of the faithful by their own shepherds will fall.",
-        "A dark, impenetrable and \"irreversible\" winter of persecution of the faithful by their own shepherds will fall"
+        "A dark, impenetrable and \"irreversible\" winter of persecution of the faithful by their own shepherds will fall",
+        "Immigrants are flooding our borders. Crime rates will soar",
+        "If we don't act now, economic collapse is imminent. Millions will lose their jobs",
+        "Fear sweeps the nation as the deadly virus spreads",
+        "The coming storm will devastate our communities. Prepare for the worst"
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "fear",
+          "anxiety",
+          "prejudice",
+          "anger"
+        ],
+        "intent": [
+          "create urgency",
+          "trigger defensive reaction",
+          "mobilize against outgroup"
+        ],
+        "commonConfusions": [
+          "Legitimate warnings vs fear-mongering; proportional vs disproportionate threat framing"
+        ],
+        "propaInsightNote": "Strong emotional arousal; often combined with loaded language."
+      }
     },
     {
       "slug": "bandwagon-reductio-ad-hitlerum",
@@ -40,12 +82,34 @@
       "definition": "Bandwagon: Suggesting that everyone supports a position so the audience should too. Reductio ad Hitlerum: Comparing something to Hitler or Nazism to discredit it.",
       "example": "\"Vichy journalism,\" a term which now fits so much of the mainstream media. It collaborates in the same way that the Vichy government in France collaborated with the Nazis.",
       "examples": [
-        "\"Vichy journalism,\" a term which now fits so much of the mainstream media. It collaborates in the same way that the Vichy government in France collaborated with the Nazis."
+        "\"Vichy journalism,\" a term which now fits so much of the mainstream media. It collaborates in the same way that the Vichy government in France collaborated with the Nazis.",
+        "Just like Soviet propaganda, they manipulate the truth",
+        "Polls show 90% of Americans support this policy. Join the majority",
+        "no different from Goebbels' propaganda machine. They spread lies to control the masses",
+        "Real Americans believe in this. Patriots everywhere support it"
       ],
       "sources": [
         "PRTA (ACL 2020)",
-        "SemEval-2020 Task 11"
-      ]
+        "SemEval-2020 Task 11",
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "belonging",
+          "social proof",
+          "moral outrage",
+          "disgust"
+        ],
+        "intent": [
+          "pressure conformity",
+          "discredit by extreme comparison"
+        ],
+        "commonConfusions": [
+          "Bandwagon: genuine popularity vs fabricated consensus. Reductio: valid analogy vs inappropriate Nazi comparison."
+        ],
+        "propaInsightNote": "Two distinct sub-techniques; Reductio ad Hitlerum is a subtype of smears."
+      }
     },
     {
       "slug": "black-and-white-fallacy",
@@ -55,13 +119,34 @@
       "example": "Francis said these words: \"Everyone is guilty for the good he could have done and did not do... If we do not oppose evil, we tacitly feed it.\"",
       "examples": [
         "Francis said these words: \"Everyone is guilty for the good he could have done and did not do... If we do not oppose evil, we tacitly feed it.\"",
-        "Francis said these words: \"Everyone is guilty for the good he could have done and did not do. If we do not oppose evil, we tacitly feed it.\""
+        "Francis said these words: \"Everyone is guilty for the good he could have done and did not do. If we do not oppose evil, we tacitly feed it.\"",
+        "You are either with us or against us. There is no middle ground in this fight for freedom",
+        "Either we cut spending now or we face national bankruptcy. Those are the only two options",
+        "Choose freedom or tyranny. There are only two paths. Liberty or oppression",
+        "You either support the troops or you hate America. There is no in-between"
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "clarity",
+          "simplicity",
+          "moral certainty"
+        ],
+        "intent": [
+          "force binary choice",
+          "eliminate nuance",
+          "polarize"
+        ],
+        "commonConfusions": [
+          "Genuine dilemmas vs false dichotomy; 'either X or Y' when Z exists"
+        ],
+        "propaInsightNote": "False dilemma; closes off middle-ground alternatives."
+      }
     },
     {
       "slug": "causal-oversimplification",
@@ -71,13 +156,33 @@
       "example": "If France had not have declared war on Germany then World War II would have never happened.",
       "examples": [
         "If France had not have declared war on Germany then World War II would have never happened.",
-        "If France had not have declared war on Germany then World War II would have never happened"
+        "If France had not have declared war on Germany then World War II would have never happened",
+        "Video games cause violence. It's simple. Every mass shooter played them",
+        "Close the borders and the economy will recover overnight",
+        "Unemployment rose because taxes were too high. Cut taxes and jobs will return"
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "understanding",
+          "closure",
+          "simple narrative"
+        ],
+        "intent": [
+          "assign blame",
+          "oversimplify causation",
+          "scapegoat"
+        ],
+        "commonConfusions": [
+          "Single cause vs multi-factor; post hoc fallacies"
+        ],
+        "propaInsightNote": "Reduces complex causality to one factor."
+      }
     },
     {
       "slug": "doubt",
@@ -87,13 +192,34 @@
       "example": "Can the same be said for the Obama Administration?",
       "examples": [
         "Can the same be said for the Obama Administration?",
-        "Can the same be said for the Obama Administration?"
+        "Can the same be said for the Obama Administration?",
+        "But can we really trust these so-called experts? Who funds their research?",
+        "The election was stolen",
+        "Skeptics ask: can we trust her funding sources?",
+        "The so-called experts might say otherwise"
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "skepticism",
+          "distrust",
+          "uncertainty"
+        ],
+        "intent": [
+          "undermine credibility",
+          "create false equivalence",
+          "paralyze criticism"
+        ],
+        "commonConfusions": [
+          "Legitimate skepticism vs manufactured doubt (e.g. climate denial playbook)"
+        ],
+        "propaInsightNote": "Questioning without evidence to sow confusion."
+      }
     },
     {
       "slug": "exaggeration-minimisation",
@@ -103,13 +229,31 @@
       "example": "Coronavirus 'risk to the American people remains very low', Trump said.",
       "examples": [
         "Coronavirus 'risk to the American people remains very low', Trump said.",
-        "Coronavirus 'risk to the American people remains very low', Trump said"
+        "Coronavirus 'risk to the American people remains very low', Trump said",
+        "The so-called crisis is nothing more than a minor inconvenience",
+        "This is the greatest scandal in American history",
+        "It was merely a small oversight. Hardly worth mentioning"
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "alarm (exaggeration)",
+          "reassurance (minimisation)"
+        ],
+        "intent": [
+          "amplify threat or downplay harm",
+          "control framing of severity"
+        ],
+        "commonConfusions": [
+          "Exaggeration vs hyperbole; minimisation vs proportional response"
+        ],
+        "propaInsightNote": "Bidirectional: inflate enemy/risk or shrink own responsibility."
+      }
     },
     {
       "slug": "flag-waving",
@@ -119,13 +263,33 @@
       "example": "Mueller attempts to stop the will of We the People!!! It's time to jail Mueller.",
       "examples": [
         "Mueller attempts to stop the will of We the People!!! It's time to jail Mueller.",
-        "Mueller attempts to stop the will of We the People!!! It's time to jail Mueller"
+        "Mueller attempts to stop the will of We the People!!! It's time to jail Mueller",
+        "True patriots stand with our troops. Real Americans support our borders",
+        "We need to show the world American strength. Make America great again",
+        "Stand with our veterans. Support our flag. America deserves leaders who love this country"
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "patriotism",
+          "national identity",
+          "belonging"
+        ],
+        "intent": [
+          "evoke loyalty",
+          "rally support",
+          "frame opposition as unpatriotic"
+        ],
+        "commonConfusions": [
+          "Genuine patriotism vs instrumental use of symbols"
+        ],
+        "propaInsightNote": "Often with slogans; appeals to in-group pride."
+      }
     },
     {
       "slug": "loaded-language",
@@ -135,13 +299,32 @@
       "example": "Outrage as Donald Trump suggests injecting disinfectant to kill virus.",
       "examples": [
         "Outrage as Donald Trump suggests injecting disinfectant to kill virus.",
-        "Outrage as Donald Trump suggests injecting disinfectant to kill virus"
+        "Outrage as Donald Trump suggests injecting disinfectant to kill virus",
+        "The brutal regime cracked down on protesters",
+        "Radical extremists hijacked the peaceful movement. Violent mobs destroyed our cities",
+        "The ruthless dictator crushed the uprising. Innocent civilians were slaughtered"
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "emotion",
+          "moral judgment",
+          "valence"
+        ],
+        "intent": [
+          "shape perception through word choice",
+          "trigger affective response"
+        ],
+        "commonConfusions": [
+          "Emotive language vs loaded language (systematic slant); opinion vs manipulation"
+        ],
+        "propaInsightNote": "Core technique; vocabulary as persuasion tool."
+      }
     },
     {
       "slug": "name-calling-labeling",
@@ -151,13 +334,33 @@
       "example": "WHO: Coronavirus emergency is 'Public Enemy Number 1'",
       "examples": [
         "WHO: Coronavirus emergency is 'Public Enemy Number 1'",
-        "WHO: Coronavirus emergency is 'Public Enemy Number 1'"
+        "WHO: Coronavirus emergency is 'Public Enemy Number 1'",
+        "The fake news media is the enemy of the people",
+        "Every single one is a lying snake",
+        "Climate deniers are dangerous fools. These anti-science fanatics threaten our future"
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "contempt",
+          "rejection",
+          "moral condemnation"
+        ],
+        "intent": [
+          "discredit",
+          "dehumanize",
+          "short-circuit argument"
+        ],
+        "commonConfusions": [
+          "Name-calling vs legitimate criticism; labeling vs accurate description"
+        ],
+        "propaInsightNote": "Overlaps with smears; negative epithets and stereotypes."
+      }
     },
     {
       "slug": "repetition",
@@ -166,12 +369,33 @@
       "definition": "Repeating a message or phrase to reinforce it and make it seem more credible or important.",
       "example": "I still have a dream. It is a dream deeply rooted in the American dream. I have a dream that...",
       "examples": [
-        "I still have a dream. It is a dream deeply rooted in the American dream. I have a dream that..."
+        "I still have a dream. It is a dream deeply rooted in the American dream. I have a dream that...",
+        "Change we can believe in. Change we can believe in. Yes we can. Change we can believe in",
+        "Jobs, jobs, jobs. That's what we need. Jobs for Americans",
+        "Freedom. Freedom. Freedom. That's what we're fighting for"
       ],
       "sources": [
         "PRTA (ACL 2020)",
-        "SemEval-2020 Task 11"
-      ]
+        "SemEval-2020 Task 11",
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "familiarity",
+          "recognition",
+          "emphasis"
+        ],
+        "intent": [
+          "reinforce message",
+          "increase perceived validity",
+          "anchor narrative"
+        ],
+        "commonConfusions": [
+          "Rhetorical emphasis vs manipulative repetition; mantra vs propaganda loop"
+        ],
+        "propaInsightNote": "Repetition increases perceived truth (illusory truth effect)."
+      }
     },
     {
       "slug": "slogans",
@@ -181,13 +405,33 @@
       "example": "\"BUILD THE WALL!\" Trump tweeted.",
       "examples": [
         "\"BUILD THE WALL!\" Trump tweeted.",
-        "\"BUILD THE WALL!\" Trump tweeted"
+        "\"BUILD THE WALL!\" Trump tweeted",
+        "\"Take back control!\"",
+        "\"No justice, no peace.\"",
+        "\"Yes we can!\""
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "belonging",
+          "identity",
+          "emotional resonance"
+        ],
+        "intent": [
+          "encapsulate message",
+          "memorable rallying cry",
+          "reduce to catchphrase"
+        ],
+        "commonConfusions": [
+          "Slogan vs headline; memorable phrase vs propaganda slogan"
+        ],
+        "propaInsightNote": "Short, punchy; often combined with flag-waving and repetition."
+      }
     },
     {
       "slug": "thought-terminating-cliches",
@@ -196,12 +440,33 @@
       "definition": "Phrases that stop critical thinking. Short, stock phrases that discourage further examination.",
       "example": "I do not really see any problems there. Marx is the President.",
       "examples": [
-        "I do not really see any problems there. Marx is the President."
+        "I do not really see any problems there. Marx is the President.",
+        "It is what it is",
+        "That's just common sense. Any reasonable person would agree",
+        "That's the way it's always been. Tradition matters"
       ],
       "sources": [
         "PRTA (ACL 2020)",
-        "SemEval-2020 Task 11"
-      ]
+        "SemEval-2020 Task 11",
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "closure",
+          "false consensus",
+          "avoidance"
+        ],
+        "intent": [
+          "stop critical thinking",
+          "dismiss objections",
+          "short-circuit debate"
+        ],
+        "commonConfusions": [
+          "Wise aphorism vs thought-terminator; common sense vs cliché"
+        ],
+        "propaInsightNote": "Phrases that end reflection; 'it is what it is', 'common sense'."
+      }
     },
     {
       "slug": "whataboutism-straw-men-red-herring",
@@ -211,13 +476,33 @@
       "example": "President Trump —who himself avoided national military service in the 1960's— keeps beating the war drums over North Korea.",
       "examples": [
         "President Trump —who himself avoided national military service in the 1960's— keeps beating the war drums over North Korea.",
-        "President Trump —who himself avoided national military service in the 1960's— keeps beating the war drums over North Korea"
+        "President Trump —who himself avoided national military service in the 1960's— keeps beating the war drums over North Korea",
+        "But what about the opposition? They take money from foreign donors too",
+        "So you want to defund the police? That means you want chaos in our streets",
+        "But look at what their side did! The other party is far worse"
       ],
       "sources": [
         "PRTA (ACL 2020)",
         "SemEval-2020 Task 11",
-        "SemEval PTC"
-      ]
+        "SemEval PTC",
+        "PropaInsight (COLING 2025)"
+      ],
+      "propaInsight": {
+        "appeals": [
+          "deflection",
+          "counter-accusation",
+          "distraction"
+        ],
+        "intent": [
+          "deflect criticism",
+          "misrepresent opposition",
+          "change subject"
+        ],
+        "commonConfusions": [
+          "Whataboutism vs relevant comparison; straw man vs fair paraphrase; red herring vs tangent"
+        ],
+        "propaInsightNote": "Three related techniques: deflection, misrepresentation, distraction."
+      }
     }
   ]
 }

@@ -37,6 +37,9 @@
     video.addEventListener('play', onPlay);
     video.addEventListener('timeupdate', onTimeUpdate);
     watchForVideoChange();
+
+    // Load analysis immediately when we have the video (no need to wait for play)
+    if (!analysisData && !isLoading) loadAnalysis();
   }
 
   function waitForElement() {
@@ -71,26 +74,11 @@
     overlayRoot.id = 'mediaguard-overlay-root';
     container.style.position = 'relative';
     container.appendChild(overlayRoot);
-    updateStatusBadge('ready');
+    updateIconBadge({});
   }
 
-  function updateStatusBadge(status, detail) {
-    if (!overlayRoot) return;
-    let badge = overlayRoot.querySelector('.mediaguard-status-badge');
-    if (!badge) {
-      badge = document.createElement('div');
-      badge.className = 'mediaguard-status-badge';
-      overlayRoot.appendChild(badge);
-    }
-    const labels = {
-      ready: 'MediaGuard — Press play',
-      loading: 'MediaGuard — Loading analysis...',
-      issues: detail ? `MediaGuard — ${detail}` : 'MediaGuard — Issues found',
-      clean: 'MediaGuard — No issues detected',
-      error: detail ? `MediaGuard — ${detail}` : 'MediaGuard — Error'
-    };
-    badge.textContent = labels[status] || labels.ready;
-    badge.className = 'mediaguard-status-badge mediaguard-status-' + status;
+  function updateIconBadge(opts) {
+    runtime.sendMessage({ action: 'updateIconBadge', ...opts }).catch(() => {});
   }
 
   function showPlaceholder(message, isError = false) {
@@ -153,37 +141,13 @@
     area.appendChild(div);
   }
 
-  function showPlaceholderWithCapture(message, onCapture) {
-    if (!overlayRoot) return;
-    let area = overlayRoot.querySelector('.mediaguard-placeholder-area');
-    if (!area) {
-      area = document.createElement('div');
-      area.className = 'mediaguard-placeholder-area';
-      overlayRoot.appendChild(area);
-    }
-    const div = document.createElement('div');
-    div.className = 'mediaguard-placeholder';
-    div.appendChild(document.createTextNode(message + ' '));
-    const btn = document.createElement('button');
-    btn.className = 'mediaguard-retry';
-    btn.style.cssText = 'background:#3b82f6;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;';
-    btn.textContent = 'Capture audio';
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      onCapture();
-    });
-    div.appendChild(btn);
-    area.innerHTML = '';
-    area.appendChild(div);
-  }
-
   async function startAudioCapture() {
     if (!window.MediaGuardCapture) {
       showPlaceholder('Capture not available.', true);
       return;
     }
     const config = await runtime.sendMessage({ action: 'getApiConfig' });
-    updateStatusBadge('loading');
+    updateIconBadge({ recording: true });
     showPlaceholder('Capturing… Select this tab and check "Share tab audio".');
 
     const videoEl = MediaGuardYouTube.getVideoElement();
@@ -195,7 +159,6 @@
       elevenlabsKey: config.elevenlabsKey || undefined,
       sttProvider: config.sttProvider || 'elevenlabs',
       onStatus: (msg) => {
-        updateStatusBadge('loading');
         showPlaceholder(msg);
       },
       onTranscript: () => {},
@@ -204,13 +167,16 @@
         loadAnnotations().then(() => renderOverlay());
       },
       onError: (msg) => {
-        updateStatusBadge('error', msg);
+        updateIconBadge({ recording: false });
         showPlaceholder(msg, true);
       },
       onCaptureStart: (cleanup) => {
         showPlaceholderWithStop('Capturing audio… Wait 1 min for auto-analyze.', () => {
           if (typeof cleanup === 'function') cleanup();
-          updateStatusBadge('ready');
+          const count = analysisData
+            ? (analysisData.alerts?.length || 0) + (analysisData.fact_checks?.length || 0)
+            : undefined;
+          updateIconBadge({ recording: false, issueCount: count });
           showPlaceholder('Capture stopped.');
         });
       }
@@ -227,14 +193,14 @@
     console.log('[MediaGuard ext] loadAnalysis start', videoId);
     const config = await runtime.sendMessage({ action: 'getApiConfig' });
     if (!config.mistralKey) {
-      updateStatusBadge('error', 'Configure Mistral key in extension settings');
+      updateIconBadge({});
       showPlaceholder('Configure Mistral key in extension settings.', true);
       return;
     }
 
     isLoading = true;
     loadError = null;
-    updateStatusBadge('loading');
+    updateIconBadge({});
     showPlaceholder('Loading analysis...');
 
     const response = await runtime.sendMessage({ action: 'getAnalysis', videoId });
@@ -245,13 +211,10 @@
       loadError = response.error;
       const status = response.status;
       const errMsg = response.error || 'Analysis failed';
-      updateStatusBadge('error', errMsg);
+      updateIconBadge({});
       if (status === 404) {
         if (response.error === 'no_transcript') {
-          showPlaceholderWithCapture(
-            'No captions. Capture this tab\'s audio with ElevenLabs instead?',
-            startAudioCapture
-          );
+      showPlaceholder('No captions — use extension popup to capture audio.');
         } else {
           showPlaceholder('Analysis failed. Configure Mistral key in extension.', true);
         }
@@ -277,15 +240,13 @@
     const hasFactChecks = factChecks.length > 0;
 
     if (!hasAlerts && !hasFactChecks) {
-      updateStatusBadge('clean');
+      updateIconBadge({ issueCount: 0 });
       showPlaceholder('No issues detected in this video.');
       return;
     }
 
-    const parts = [];
-    if (hasAlerts) parts.push(alerts.length + ' manipulation');
-    if (hasFactChecks) parts.push(factChecks.length + ' fact-check');
-    updateStatusBadge('issues', parts.join(', '));
+    const issueCount = alerts.length + factChecks.length;
+    updateIconBadge({ issueCount });
     const area = overlayRoot.querySelector('.mediaguard-placeholder-area');
     if (area) area.innerHTML = '';
     renderSegmentMarkers();
@@ -296,10 +257,7 @@
       const mins = Math.floor(remaining / 60);
       const secs = Math.round(remaining % 60);
       const remainingStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
-      showPlaceholderWithCapture(
-        `Video partially analyzed (${remainingStr} remaining). Capture remaining audio?`,
-        startAudioCapture
-      );
+      showPlaceholder(`Partial analysis (${remainingStr} left) — capture via extension popup.`);
     }
   }
 
@@ -352,6 +310,13 @@
       if (!isOverProgressArea(e.clientX, e.clientY)) {
         updateFloatingPanel(null);
         return;
+      }
+      const panel = overlayRoot && overlayRoot.querySelector('.mediaguard-floating-panel');
+      if (panel && !panel.classList.contains('mediaguard-hidden') && panel._mediaguardSegments) {
+        const rect = panel.getBoundingClientRect();
+        if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+          return;
+        }
       }
       if (hoverPanelTimeout) clearTimeout(hoverPanelTimeout);
       hoverPanelTimeout = null;
@@ -422,9 +387,14 @@
   function collectSegments() {
     if (!analysisData) return [];
     const segments = [];
+    function resolveType(data, defaultType) {
+      if (data.type === 'fact_check' || data.type === 'fact-check') return 'fact-check';
+      if (data.type === 'manipulation') return 'manipulation';
+      return defaultType;
+    }
     (analysisData.alerts || []).forEach((a) => {
       segments.push({
-        type: 'manipulation',
+        type: resolveType(a, 'manipulation'),
         label: a.technique,
         start: a.start,
         end: a.end,
@@ -433,7 +403,7 @@
     });
     (analysisData.fact_checks || []).forEach((f) => {
       segments.push({
-        type: 'fact-check',
+        type: resolveType(f, 'fact-check'),
         label: f.claim,
         start: f.start,
         end: f.end,
@@ -558,8 +528,7 @@
 
     const annotationId = d.id || d.annotation_id;
     const hasId = !!annotationId;
-    const userVote = hasId ? userVotes[annotationId] : null;
-    const alreadyVoted = !!userVote;
+    const userVote = hasId ? (d.user_vote || userVotes[annotationId]) : null;
 
     const voteRow = document.createElement('div');
     voteRow.className = 'mediaguard-vote-row';
@@ -569,16 +538,15 @@
     const upBtn = document.createElement('button');
     upBtn.className = 'mediaguard-vote-btn mediaguard-vote-up' + (userVote === 'up' ? ' active' : '');
     upBtn.type = 'button';
-    upBtn.title = !hasId ? 'Vote when annotation is saved' : alreadyVoted ? 'Already voted' : 'Helpful';
-    upBtn.disabled = !hasId || alreadyVoted;
+    upBtn.title = !hasId ? 'Vote when annotation is saved' : 'Helpful';
+    upBtn.disabled = !hasId;
     upBtn.innerHTML = '&#9650; <span class="mediaguard-vote-count">' + upvotes + '</span>';
     upBtn.addEventListener('click', async (e) => {
-      if (!hasId || alreadyVoted) return;
+      if (!hasId) return;
       e.preventDefault();
       const resp = await runtime.sendMessage({ action: 'submitVote', annotationId, vote: 'up' });
       if (resp && !resp.error) {
         userVotes[annotationId] = 'up';
-        storage.local.set({ mediaguard_annotation_votes: userVotes });
         mergeAnnotation(segment, resp);
         renderOverlay();
         const panel = overlayRoot && overlayRoot.querySelector('.mediaguard-floating-panel');
@@ -592,16 +560,15 @@
     const downBtn = document.createElement('button');
     downBtn.className = 'mediaguard-vote-btn mediaguard-vote-down' + (userVote === 'down' ? ' active' : '');
     downBtn.type = 'button';
-    downBtn.title = !hasId ? 'Vote when annotation is saved' : alreadyVoted ? 'Already voted' : 'Not helpful';
-    downBtn.disabled = !hasId || alreadyVoted;
+    downBtn.title = !hasId ? 'Vote when annotation is saved' : 'Not helpful';
+    downBtn.disabled = !hasId;
     downBtn.innerHTML = '&#9660; <span class="mediaguard-vote-count">' + downvotes + '</span>';
     downBtn.addEventListener('click', async (e) => {
-      if (!hasId || alreadyVoted) return;
+      if (!hasId) return;
       e.preventDefault();
       const resp = await runtime.sendMessage({ action: 'submitVote', annotationId, vote: 'down' });
       if (resp && !resp.error) {
         userVotes[annotationId] = 'down';
-        storage.local.set({ mediaguard_annotation_votes: userVotes });
         mergeAnnotation(segment, resp);
         renderOverlay();
         const panel = overlayRoot && overlayRoot.querySelector('.mediaguard-floating-panel');
@@ -824,8 +791,6 @@
     } else {
       annotationsData = [];
     }
-    const voteData = await storage.local.get('mediaguard_annotation_votes');
-    userVotes = voteData.mediaguard_annotation_votes || {};
     if (annotationsData && annotationsData.length > 0) {
       mergeAnnotationsIntoAnalysis();
       renderOverlay();
@@ -837,7 +802,7 @@
     annotationsData.forEach((ann) => {
       if (ann.type === 'manipulation') {
         const existing = (analysisData.alerts || []).find(
-          (a) => Math.abs(a.start - ann.timestamp_start) < 1
+          (a) => !a.id && Math.abs((a.start ?? 0) - ann.timestamp_start) < 1
         );
         if (existing) Object.assign(existing, ann);
         else (analysisData.alerts || (analysisData.alerts = [])).push({
@@ -850,11 +815,12 @@
           end: ann.timestamp_end,
           id: ann.id,
           upvotes: ann.upvotes ?? 0,
-          downvotes: ann.downvotes ?? 0
+          downvotes: ann.downvotes ?? 0,
+          user_vote: ann.user_vote
         });
       } else {
         const existing = (analysisData.fact_checks || []).find(
-          (f) => Math.abs(f.start - ann.timestamp_start) < 1
+          (f) => !f.id && Math.abs((f.start ?? 0) - ann.timestamp_start) < 1
         );
         if (existing) Object.assign(existing, ann);
         else (analysisData.fact_checks || (analysisData.fact_checks = [])).push({
@@ -866,11 +832,37 @@
           end: ann.timestamp_end,
           id: ann.id,
           upvotes: ann.upvotes ?? 0,
-          downvotes: ann.downvotes ?? 0
+          downvotes: ann.downvotes ?? 0,
+          user_vote: ann.user_vote
         });
       }
     });
   }
+
+  runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'getVideoState') {
+      const segments = collectSegments();
+      sendResponse({
+        videoId,
+        analysisData,
+        isLoading,
+        loadError,
+        segments,
+        hasOverlay: !!overlayRoot
+      });
+    } else if (message.action === 'startCapture') {
+      startAudioCapture();
+      sendResponse({ ok: true });
+    } else if (message.action === 'seekTo') {
+      const { time } = message;
+      if (video && typeof time === 'number' && time >= 0) {
+        video.currentTime = time;
+        sendResponse({ ok: true });
+      } else {
+        sendResponse({ error: 'Invalid time or no video' });
+      }
+    }
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

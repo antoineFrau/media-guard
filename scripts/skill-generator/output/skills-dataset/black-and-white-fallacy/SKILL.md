@@ -1,26 +1,29 @@
 ```yaml
 ---
 name: black-and-white-fallacy
-description: The black-and-white fallacy (FR: fausse dichotomie) is a manipulation technique that presents two alternatives as the only possibilities, when in fact more options exist. This false dilemma or binary framing simplifies complex issues, polarizing discourse and limiting nuanced understanding. Trigger terms in English include "either/or," "only," and "must," while in French, "soit... soit," "seulement," and "doit" may signal this technique.
+description: "The black-and-white fallacy (FR: fausse dichotomie) presents two alternatives as the only possibilities, when in fact more options exist. This false dilemma or binary framing appeals to clarity, simplicity, and moral certainty, often with the intent to force a binary choice, eliminate nuance, or polarize. Trigger terms in English include 'either...or,' 'only two options,' and 'no middle ground,' while in French they include 'soit...soit,' 'seulement deux options,' and 'pas de juste milieu.'"
 ---
 
 ## What it is
-The black-and-white fallacy (FR: fausse dichotomie) is a rhetorical strategy that oversimplifies complex issues by presenting only two opposing options, ignoring the spectrum of possibilities in between. This technique is often used to manipulate audiences by polarizing debates, forcing choices, and suppressing nuanced perspectives.
+The black-and-white fallacy (FR: fausse dichotomie) is a manipulation technique that presents a situation as having only two possible outcomes or choices, when in reality, more options exist. This false dichotomy simplifies complex issues, appealing to clarity and moral certainty, and often aims to polarize or force a binary choice.
 
 ## How to recognize it
-Identify the black-and-white fallacy by looking for language that:
-- Presents only two options (e.g., "either/or," "only," "must" in English; "soit... soit," "seulement," "doit" in French).
-- Ignores or dismisses intermediate positions or complexities.
-- Uses absolute terms (e.g., "always," "never," "all," "none").
-- Frames issues as binary choices where more nuanced options exist.
+- **Appeals evoked:** Clarity, simplicity, moral certainty
+- **Author intent:** Force binary choice; eliminate nuance; polarize
+- **Trigger phrases (EN):** "either...or," "only two options," "no middle ground," "choose between X and Y"
+- **Trigger phrases (FR):** "soit...soit," "seulement deux options," "pas de juste milieu," "choisir entre X et Y"
+- **Context clues:** The argument dismisses or ignores middle-ground alternatives, presenting a situation as having only two possible outcomes.
 
 ## Examples
-- "You are either with us or against us." (FR: "Vous êtes soit avec nous, soit contre nous.")
-- "Either you support this policy, or you are against progress." (FR: "Soit vous soutenez cette politique, soit vous êtes contre le progrès.")
-- "Everyone is guilty for the good he could have done and did not do. If we do not oppose evil, we tacitly feed it." (FR: "Tout le monde est coupable du bien qu'il aurait pu faire et n'a pas fait. Si nous n'opposons pas le mal, nous l'alimentons tacitement.")
+- "Francis said these words: 'Everyone is guilty for the good he could have done and did not do... If we do not oppose evil, we tacitly feed it.'"
+- "You are either with us or against us. There is no middle ground in this fight for freedom."
+- "Either we cut spending now or we face national bankruptcy. Those are the only two options."
+- "Choose freedom or tyranny. There are only two paths. Liberty or oppression."
+- "You either support the troops or you hate America. There is no in-between."
 
 ## Research backing
-- PRTA (ACL 2020): This work explores propaganda techniques, including the black-and-white fallacy, in political and media discourse.
-- SemEval-2020 Task 11: This task focuses on identifying persuasive techniques, including false dilemmas, in text.
-- SemEval PTC: The Persuasive Techniques Corpus provides annotated examples of manipulation techniques, including the black-and-white fallacy, in various contexts.
+- PRTA (ACL 2020)
+- SemEval-2020 Task 11
+- SemEval PTC
+- PropaInsight (COLING 2025)
 ```

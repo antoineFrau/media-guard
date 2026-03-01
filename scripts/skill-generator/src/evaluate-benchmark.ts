@@ -412,6 +412,7 @@ async function evaluateAgent(
 async function main() {
   const args = process.argv.slice(2);
   const useJudge = args.includes("--judge");
+  const includeYoutube = args.includes("--include-youtube");
   const limitArg = args.find((a) => a.startsWith("--limit="));
   const limit = limitArg ? parseInt(limitArg.split("=")[1]!, 10) : 50;
 
@@ -430,11 +431,12 @@ async function main() {
   console.log("MediaGuard Agent Benchmark");
   console.log(`  Eval set: ${evalArticles.length} articles`);
   console.log(`  LLM Judge: ${useJudge ? "enabled" : "disabled"}`);
+  console.log(`  Agents: dataset-backed${includeYoutube ? " + YouTube" : " only (Clemovitch excluded)"}`);
   console.log("");
 
   const results: EvalResult[] = [];
 
-  // Agent 1: Dataset-backed skills (SemEval taxonomy)
+  // Dataset-backed skills (SemEval + PropaInsight multi-source)
   console.log("Evaluating dataset-backed agent (skills-dataset)...");
   const datasetResult = await evaluateAgent(
     apiKey,
@@ -445,16 +447,18 @@ async function main() {
   );
   results.push(datasetResult);
 
-  // Agent 2: YouTube-derived skills (French/ad-hoc taxonomy)
-  console.log("Evaluating YouTube-derived agent (skills)...");
-  const youtubeResult = await evaluateAgent(
-    apiKey,
-    SKILLS_YOUTUBE_DIR,
-    "skills-youtube",
-    evalArticles,
-    useJudge
-  );
-  results.push(youtubeResult);
+  // YouTube-derived skills: only with --include-youtube
+  if (includeYoutube) {
+    console.log("Evaluating YouTube-derived agent (skills)...");
+    const youtubeResult = await evaluateAgent(
+      apiKey,
+      SKILLS_YOUTUBE_DIR,
+      "skills-youtube",
+      evalArticles,
+      useJudge
+    );
+    results.push(youtubeResult);
+  }
 
   // Print results
   console.log("\n" + "=".repeat(60));
@@ -477,7 +481,7 @@ async function main() {
     JSON.stringify(
       {
         timestamp: new Date().toISOString(),
-        options: { limit, useJudge, evalSplit: "eval50" },
+        options: { limit, useJudge, includeYoutube, evalSplit: "eval50" },
         results,
       },
       null,

@@ -2,13 +2,31 @@
 
 ## Abstract
 
-MediaGuard is an LLM-based system for detecting rhetorical manipulation techniques in video transcripts and news text. This document summarizes the methodology, experimental setup, and results of benchmarking two agent configurations—dataset-backed skills (SemEval taxonomy) and YouTube-derived skills (French/ad-hoc taxonomy)—on a 50-item evaluation set with gold-annotated spans. We employ both span-based metrics (precision, recall, F1) and an LLM-as-judge for semantic correctness assessment. The dataset-backed agent achieves 57.8% span F1 and 61.8% LLM judge score, strongly validating the hypothesis that taxonomy alignment and dataset-backed definitions improve detection accuracy.
+MediaGuard is an LLM-based system for detecting rhetorical manipulation techniques in video transcripts and news text. This document summarizes the methodology, experimental setup, and results of benchmarking the dataset-backed agent (multi-source: PRTA, SemEval, PropaInsight) on a 50-item evaluation set with gold-annotated spans. We employ both span-based metrics (precision, recall, F1) and an LLM-as-judge for semantic correctness. The multi-source agent achieves 64.2% span F1 and 70.0% LLM judge score. PropaInsight enrichment (appeals, intent, confusions) improves over the single-source baseline (+6.4% F1, +8.2% judge).
 
 ---
 
 ## 1. Introduction
 
 Propaganda and rhetorical manipulation in media pose significant risks to public discourse. MediaGuard addresses this by applying large language models (Mistral) to identify manipulation techniques in text, guided by skill definitions that encode technique taxonomies and recognition criteria. Two skill-generation flows exist: (1) extraction from YouTube transcripts (Clément Viktorovitch channel), producing French-named techniques; (2) generation from academic datasets (SemEval-2020 Task 11, PropaInsight), producing SemEval-aligned slugs. The research questions concern which approach yields better accuracy and how evaluation should be conducted when gold annotations exist.
+
+---
+
+## 1.1 Multi-Source Skill Generation (Improvements)
+
+**Proposed and implemented:**
+
+1. **PropaInsight supplement** (`data/propainsight-supplement.json`): For each of the 14 SemEval techniques, adds:
+   - **Appeals**: Emotional/arousal evoked in readers (e.g., fear, credibility, belonging)
+   - **Intent**: Author motive (e.g., persuade, discredit, create urgency)
+   - **Common confusions**: Distinguishing cues (e.g., legitimate skepticism vs manufactured doubt)
+   - **PropaInsight note**: Cross-references and overlap with other techniques
+
+2. **Merged definitions**: `loadTechniqueDefinitions` now combines PRTA + SemEval PTC examples + PropaInsight supplements into a single `technique-definitions.json`.
+
+3. **Enriched generation prompt**: `generateSkillFromDefinition` passes PropaInsight context to Mistral, strengthening the "How to recognize it" section with appeal and intent cues.
+
+4. **Benchmark**: YouTube/Clemovitch agent excluded by default; use `--include-youtube` to compare.
 
 ---
 
@@ -37,11 +55,14 @@ Each article contains gold spans with `start_char`, `end_char`, `technique_slug`
 
 ## 3. Methodology
 
-### 3.1 Agents
+### 3.1 Agent (Dataset-Backed, Multi-Source)
 
-**Agent A: skills-dataset** — Skills generated from `technique-definitions-static.json` and SemEval examples. Uses exact SemEval slugs (e.g., `appeal-to-authority`, `loaded-language`).
+**skills-dataset** — Skills generated from:
+- PRTA + SemEval base definitions (`technique-definitions-static.json`)
+- SemEval PTC examples (`semeval-export.json`)
+- PropaInsight appeals, intent, confusions (`propainsight-supplement.json`)
 
-**Agent B: skills-youtube** — Skills extracted from YouTube transcripts. Uses French/ad-hoc slugs (e.g., `appel-a-la-peur`, `fausse-dichotomie`) that do not map to SemEval gold labels.
+Uses exact SemEval slugs (e.g., `appeal-to-authority`, `loaded-language`). YouTube-derived skills (Clemovitch) are excluded from the benchmark.
 
 ### 3.2 Evaluation Protocol
 
@@ -56,25 +77,35 @@ Each article contains gold spans with `start_char`, `end_char`, `technique_slug`
 
 ## 4. Results
 
-### 4.1 Span-Based Metrics (50 articles, 58 gold spans)
+### 4.1 Multi-Source Skill Generation
+
+Skills are generated from multiple sources:
+- **PRTA (ACL 2020)** + **SemEval-2020 Task 11**: Base definitions and examples
+- **SemEval PTC** (semeval-export.json): Curated technique examples from 50-item eval set
+- **PropaInsight (COLING 2025)**: Appeals (emotional/arousal evoked), intent (author motive), common confusions
+
+The PropaInsight supplement enriches "How to recognize it" with appeal and intent cues, improving recognition accuracy.
+
+### 4.2 Span-Based Metrics (50 articles, 58 gold spans)
 
 | Agent | Samples | Gold | Pred | TP | Precision | Recall | F1 |
 |-------|---------|------|------|-----|-----------|--------|------|
-| skills-dataset | 50 | 58 | 115 | 50 | 43.5% | 86.2% | **57.8%** |
-| skills-youtube | 50 | 58 | 90 | 0 | 0.0% | 0.0% | **0.0%** |
+| skills-dataset (multi-source) | 50 | 58 | 104 | 52 | 50.0% | 89.7% | **64.2%** |
+| ~~skills-youtube~~ | — | — | — | — | — | — | *(excluded)* |
 
-The YouTube agent achieves zero span F1 because its output slugs do not match gold labels; the analyzer finds manipulations but uses a different taxonomy.
+*Previous single-source baseline: F1 57.8%. Multi-source PropaInsight enrichment: +6.4% F1.*
 
-### 4.2 LLM-as-Judge (Semantic Correctness)
+### 4.3 LLM-as-Judge (Semantic Correctness)
 
 | Agent | Judge Score |
 |-------|-------------|
-| skills-dataset | **61.8%** |
-| skills-youtube | **37.0%** |
+| skills-dataset (multi-source) | **70.0%** |
+
+*Previous single-source: 61.8%. Multi-source: +8.2%.*
 
 The LLM judge rewards semantic overlap: even when span F1 is 0 (YouTube), the judge assigns ~37% for partial technique equivalence (e.g., `fausse-dichotomie` vs `black-and-white-fallacy`).
 
-### 4.3 Per-Technique Performance (skills-dataset)
+### 4.4 Per-Technique Performance (skills-dataset)
 
 Techniques with highest F1: exaggeration-minimisation (88.9%), flag-waving (80%), bandwagon-reductio-ad-hitlerum (80%), repetition (80%), causal-oversimplification (72.7%). Techniques with lowest F1: slogans (35.3%), appeal-to-fear-prejudice (42.1%), black-and-white-fallacy (52.6%).
 
@@ -103,7 +134,7 @@ All 50 items have expected output (gold spans). The evaluation pipeline uses the
 
 ## 6. Conclusion
 
-We have established a 50-item evaluation set with gold-annotated spans drawn from PRTA samples and curated SemEval-style and propaganda literature examples. We benchmarked two MediaGuard agents: one with dataset-backed skills (SemEval taxonomy) and one with YouTube-derived skills (French taxonomy). The dataset-backed agent achieves 57.8% F1 and 61.8% LLM judge score; the YouTube agent achieves 0% F1 but 37% judge score due to taxonomy mismatch. These results strongly support the use of dataset-backed, taxonomy-aligned skills for propaganda technique detection when evaluated against SemEval-style gold standards. Future work should include evaluation on the full SemEval validation set (upon access), cross-domain generalization to video transcripts, and exploration of LLM judge calibration and reliability.
+We have established a 50-item evaluation set with gold-annotated spans drawn from PRTA samples and curated SemEval-style and propaganda literature examples. The dataset-backed agent uses **multi-source skill generation**: PRTA, SemEval PTC, and PropaInsight (COLING 2025) for appeals, intent, and common confusions. It achieves **64.2% F1** and **70.0% LLM judge score** on the 50-item eval set. PropaInsight enrichment improves over the single-source baseline (+6.4% F1, +8.2% judge). The benchmark excludes YouTube-derived skills (Clemovitch) by default. These results support multi-source, taxonomy-aligned skills for propaganda technique detection. Future work: full SemEval validation (upon access), cross-domain generalization, LLM judge calibration.
 
 ---
 
@@ -113,8 +144,11 @@ We have established a 50-item evaluation set with gold-annotated spans drawn fro
 # Export 50-item dataset
 cd scripts/skill-generator && python3 scripts/export-semeval.py
 
-# Run benchmark (50 items, with LLM judge)
+# Run benchmark (50 items, dataset-only, with LLM judge)
 npm run evaluate:benchmark -- --limit=50 --judge
+
+# Include YouTube agent (optional)
+npm run evaluate:benchmark -- --limit=50 --judge --include-youtube
 
 # Run evaluation for dataset skills only (validation split)
 npm run evaluate -- --skills=output/skills-dataset

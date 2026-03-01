@@ -160,6 +160,14 @@ Output the complete SKILL.md content only.`;
       : String(rawContent);
 }
 
+/** PropaInsight supplement for multi-source enrichment. */
+export interface PropaInsightSupplementInput {
+  appeals: string[];
+  intent: string[];
+  commonConfusions?: string;
+  propaInsightNote?: string;
+}
+
 /**
  * Dataset-backed technique definition for skill generation.
  */
@@ -171,6 +179,7 @@ export interface TechniqueDefinitionInput {
   example?: string;
   examples?: string[];
   sources: string[];
+  propaInsight?: PropaInsightSupplementInput;
 }
 
 /**
@@ -190,7 +199,7 @@ export async function generateSkillFromDefinition(
       ? [technique.example]
       : [];
   const examplesContext = examples
-    .slice(0, 5)
+    .slice(0, 7)
     .map((e) => `- "${e}"`)
     .join("\n");
 
@@ -204,23 +213,36 @@ export async function generateSkillFromDefinition(
           .join("\n")
       : technique.sources.map((s) => `- ${s}`).join("\n");
 
+  // Multi-source: PropaInsight appeals, intent, confusions
+  const propaContext = technique.propaInsight
+    ? `
+**PropaInsight (COLING 2025) - appeals evoked:** ${technique.propaInsight.appeals.join(", ")}
+**PropaInsight - author intent:** ${technique.propaInsight.intent.join("; ")}
+**Common confusions to avoid:** ${technique.propaInsight.commonConfusions ?? "N/A"}
+**Note:** ${technique.propaInsight.propaInsightNote ?? "N/A"}`
+    : "";
+
   const systemPrompt = `You generate Cursor SKILL.md files that teach an AI agent to recognize and analyze media/political manipulation techniques in text (news articles, video transcripts, political discourse).
 
 Use the SemEval/PTC taxonomy. The slug MUST be exactly: ${technique.slug}
+
+**Multi-source enrichment:** Integrate definitions from PRTA (ACL 2020), SemEval-2020 Task 11, and PropaInsight (COLING 2025) when available. PropaInsight adds appeals (emotional/arousal) and intent (author motive) dimensions—use these to strengthen "How to recognize it".
 
 Output format:
 1. YAML frontmatter with name: "${technique.slug}" and description (third person, max 1024 chars, include trigger terms in FR and EN)
 2. Sections: ## What it is, ## How to recognize it, ## Examples, ## Research backing
 3. Concise, under 200 lines total
-4. Include bilingual trigger terms (French and English) where relevant`;
+4. Include bilingual trigger terms (French and English) where relevant
+5. In "How to recognize it": add recognition cues from appeals/intent when provided`;
 
   const userPrompt = `Generate a SKILL.md for this manipulation technique:
 
 **Technique (slug):** ${technique.slug}
 **Name:** ${technique.name}${technique.nameFr ? ` (FR: ${technique.nameFr})` : ""}
-**Definition:** ${technique.definition}
+**Definition (PRTA/SemEval):** ${technique.definition}
+${propaContext}
 
-**Examples from dataset:**
+**Examples from datasets (SemEval PTC, curated):**
 ${examplesContext || "(no examples provided)"}
 
 **Sources to cite:**

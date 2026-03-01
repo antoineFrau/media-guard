@@ -1,4 +1,44 @@
-# MediaGuard API
+<div align="center">
+  <img src="logov5.svg" alt="MediaGuard" width="128" height="128" />
+</div>
+
+# MediaGuard
+
+[![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.0-2D3748.svg)](https://www.prisma.io/)
+[![Mistral](https://img.shields.io/badge/LLM-Mistral-orange.svg)](https://mistral.ai/)
+[![Benchmark F1](https://img.shields.io/badge/Span%20F1-64.2%25-success.svg)](/docs/CONCLUSION.md)
+[![LLM Judge](https://img.shields.io/badge/LLM%20Judge-70.0%25-success.svg)](/docs/CONCLUSION.md)
+
+> LLM-based detection of rhetorical manipulation techniques in video transcripts and news text.
+
+---
+
+## Research & Papers
+
+MediaGuard builds on the following academic work:
+
+| Paper | Venue | Role |
+|-------|-------|------|
+| [**PRTA**](https://aclanthology.org/2020.acl-demos.32/) — A System to Support the Analysis of Propaganda Techniques in the News | ACL 2020 | Base definitions, Tanbih framework |
+| [**SemEval-2020 Task 11**](https://aclanthology.org/2020.semeval-1.186/) — Detection of Propaganda Techniques in News Articles | SemEval 2020 | 14-technique taxonomy, span identification |
+| [**PropaInsight**](https://aclanthology.org/2025.coling-main.376/) — Toward Deeper Understanding of Propaganda in Terms of Techniques, Appeals, and Intent | COLING 2025 | Appeals, intent, common confusions enrichment |
+
+See [docs/CONCLUSION.md](docs/CONCLUSION.md) for full methodology, evaluation protocol, and benchmark results.
+
+---
+
+## Components
+
+- **API** — Backend for analysis, annotations, and crowdsourced improvements
+- **Browser Extension** — YouTube video analysis and fact-check overlays (Chrome, Firefox)
+- **STT App** — Real-time speech-to-text with Mic/Tab capture
+- **Skill Generator** — Dataset-backed manipulation technique definitions (PRTA + SemEval + PropaInsight)
+
+---
+
+## MediaGuard API
 
 Backend for MediaGuard: video analysis (manipulation + fact-check detection), annotations, and crowdsourced improvements via Mistral AI.
 

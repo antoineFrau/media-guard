@@ -1,24 +1,23 @@
 ```yaml
 ---
 name: repetition
-description: "Repetition (FR: Répétition) is a manipulation technique where a message or phrase is repeated to reinforce it and make it seem more credible or important. This technique is often used in political discourse and media to emphasize a point, create a sense of familiarity, or sway public opinion. Trigger terms in English include 'reiterate,' 'emphasize,' 'again,' and 'once more.' In French, terms like 'répéter,' 'insister,' 'encore,' and 'de nouveau' are commonly used."
+description: "Repetition (FR: Répétition) is a manipulation technique where a message or phrase is repeated to reinforce it and make it seem more credible or important. Trigger terms in English include 'repeatedly,' 'again,' 'once more,' and in French 'répétition,' 'encore,' 'à nouveau.' This technique leverages the illusory truth effect, where repeated statements are perceived as more true, and can evoke appeals of familiarity, recognition, and emphasis while intending to reinforce the message, increase perceived validity, or anchor a narrative."
 ---
 ## What it is
-Repetition is a persuasive technique where a message, phrase, or idea is repeated multiple times to reinforce its importance and credibility. This technique is commonly used in political speeches, media, and advertising to make a point more memorable and convincing.
+Repetition is a manipulation technique where a message or phrase is repeated to reinforce it and make it seem more credible or important. This technique is often used in political discourse, advertising, and media to anchor a narrative or increase the perceived validity of a claim. The illusory truth effect, where repeated statements are perceived as more true, plays a significant role in the effectiveness of this technique.
 
 ## How to recognize it
-- The same phrase or idea is repeated multiple times in close proximity.
-- Keywords or phrases are emphasized through repetition.
-- The repetition is often used to create a rhythmic or memorable effect.
-- Trigger terms in English: "reiterate," "emphasize," "again," "once more."
-- Trigger terms in French: "répéter," "insister," "encore," "de nouveau."
+Repetition can be recognized by the frequent restatement of a key message or phrase. Look for trigger terms such as "repeatedly," "again," "once more" in English, and "répétition," "encore," "à nouveau" in French. The technique often evokes appeals of familiarity, recognition, and emphasis, and the author's intent is typically to reinforce the message, increase perceived validity, or anchor a narrative. Be cautious not to confuse rhetorical emphasis with manipulative repetition; a mantra is not necessarily a propaganda loop.
 
 ## Examples
 - "I still have a dream. It is a dream deeply rooted in the American dream. I have a dream that..."
-- "We must ensure that our borders are secure. Our borders must be secure. Secure borders are essential for our nation's safety."
-- "C'est une promesse que nous devons tenir. Nous devons tenir cette promesse. Tenir cette promesse est crucial pour notre avenir."
+- "Change we can believe in. Change we can believe in. Yes we can. Change we can believe in"
+- "Jobs, jobs, jobs. That's what we need. Jobs for Americans"
+- "Freedom. Freedom. Freedom. That's what we're fighting for"
 
 ## Research backing
-- PRTA (ACL 2020): This paper discusses various persuasive techniques, including repetition, and their impact on public opinion.
-- SemEval-2020 Task 11: This task focuses on identifying persuasive techniques in text, including repetition, and provides a dataset for analysis.
+- PRTA (ACL 2020)
+- SemEval-2020 Task 11
+- SemEval PTC
+- PropaInsight (COLING 2025)
 ```

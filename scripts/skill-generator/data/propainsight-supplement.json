@@ -1,0 +1,92 @@
+{
+  "_meta": {
+    "source": "PropaInsight (COLING 2025) - appeals and intent taxonomy",
+    "note": "Supplement for SemEval techniques. PropaInsight models propaganda as techniques + appeals + intent."
+  },
+  "supplements": {
+    "appeal-to-authority": {
+      "appeals": ["credibility", "trust", "expertise"],
+      "intent": ["persuade by association", "lend legitimacy"],
+      "commonConfusions": ["Not all expert citations are propaganda; distinguish authoritative sourcing from name-dropping"],
+      "propaInsightNote": "Often overlaps with glittering generalities when the authority is idealized."
+    },
+    "appeal-to-fear-prejudice": {
+      "appeals": ["fear", "anxiety", "prejudice", "anger"],
+      "intent": ["create urgency", "trigger defensive reaction", "mobilize against outgroup"],
+      "commonConfusions": ["Legitimate warnings vs fear-mongering; proportional vs disproportionate threat framing"],
+      "propaInsightNote": "Strong emotional arousal; often combined with loaded language."
+    },
+    "bandwagon-reductio-ad-hitlerum": {
+      "appeals": ["belonging", "social proof", "moral outrage", "disgust"],
+      "intent": ["pressure conformity", "discredit by extreme comparison"],
+      "commonConfusions": ["Bandwagon: genuine popularity vs fabricated consensus. Reductio: valid analogy vs inappropriate Nazi comparison."],
+      "propaInsightNote": "Two distinct sub-techniques; Reductio ad Hitlerum is a subtype of smears."
+    },
+    "black-and-white-fallacy": {
+      "appeals": ["clarity", "simplicity", "moral certainty"],
+      "intent": ["force binary choice", "eliminate nuance", "polarize"],
+      "commonConfusions": ["Genuine dilemmas vs false dichotomy; 'either X or Y' when Z exists"],
+      "propaInsightNote": "False dilemma; closes off middle-ground alternatives."
+    },
+    "causal-oversimplification": {
+      "appeals": ["understanding", "closure", "simple narrative"],
+      "intent": ["assign blame", "oversimplify causation", "scapegoat"],
+      "commonConfusions": ["Single cause vs multi-factor; post hoc fallacies"],
+      "propaInsightNote": "Reduces complex causality to one factor."
+    },
+    "doubt": {
+      "appeals": ["skepticism", "distrust", "uncertainty"],
+      "intent": ["undermine credibility", "create false equivalence", "paralyze criticism"],
+      "commonConfusions": ["Legitimate skepticism vs manufactured doubt (e.g. climate denial playbook)"],
+      "propaInsightNote": "Questioning without evidence to sow confusion."
+    },
+    "exaggeration-minimisation": {
+      "appeals": ["alarm (exaggeration)", "reassurance (minimisation)"],
+      "intent": ["amplify threat or downplay harm", "control framing of severity"],
+      "commonConfusions": ["Exaggeration vs hyperbole; minimisation vs proportional response"],
+      "propaInsightNote": "Bidirectional: inflate enemy/risk or shrink own responsibility."
+    },
+    "flag-waving": {
+      "appeals": ["patriotism", "national identity", "belonging"],
+      "intent": ["evoke loyalty", "rally support", "frame opposition as unpatriotic"],
+      "commonConfusions": ["Genuine patriotism vs instrumental use of symbols"],
+      "propaInsightNote": "Often with slogans; appeals to in-group pride."
+    },
+    "loaded-language": {
+      "appeals": ["emotion", "moral judgment", "valence"],
+      "intent": ["shape perception through word choice", "trigger affective response"],
+      "commonConfusions": ["Emotive language vs loaded language (systematic slant); opinion vs manipulation"],
+      "propaInsightNote": "Core technique; vocabulary as persuasion tool."
+    },
+    "name-calling-labeling": {
+      "appeals": ["contempt", "rejection", "moral condemnation"],
+      "intent": ["discredit", "dehumanize", "short-circuit argument"],
+      "commonConfusions": ["Name-calling vs legitimate criticism; labeling vs accurate description"],
+      "propaInsightNote": "Overlaps with smears; negative epithets and stereotypes."
+    },
+    "repetition": {
+      "appeals": ["familiarity", "recognition", "emphasis"],
+      "intent": ["reinforce message", "increase perceived validity", "anchor narrative"],
+      "commonConfusions": ["Rhetorical emphasis vs manipulative repetition; mantra vs propaganda loop"],
+      "propaInsightNote": "Repetition increases perceived truth (illusory truth effect)."
+    },
+    "slogans": {
+      "appeals": ["belonging", "identity", "emotional resonance"],
+      "intent": ["encapsulate message", "memorable rallying cry", "reduce to catchphrase"],
+      "commonConfusions": ["Slogan vs headline; memorable phrase vs propaganda slogan"],
+      "propaInsightNote": "Short, punchy; often combined with flag-waving and repetition."
+    },
+    "thought-terminating-cliches": {
+      "appeals": ["closure", "false consensus", "avoidance"],
+      "intent": ["stop critical thinking", "dismiss objections", "short-circuit debate"],
+      "commonConfusions": ["Wise aphorism vs thought-terminator; common sense vs cliché"],
+      "propaInsightNote": "Phrases that end reflection; 'it is what it is', 'common sense'."
+    },
+    "whataboutism-straw-men-red-herring": {
+      "appeals": ["deflection", "counter-accusation", "distraction"],
+      "intent": ["deflect criticism", "misrepresent opposition", "change subject"],
+      "commonConfusions": ["Whataboutism vs relevant comparison; straw man vs fair paraphrase; red herring vs tangent"],
+      "propaInsightNote": "Three related techniques: deflection, misrepresentation, distraction."
+    }
+  }
+}
