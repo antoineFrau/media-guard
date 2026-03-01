@@ -2,8 +2,10 @@
   'use strict';
 
   const runtime = typeof browser !== 'undefined' ? browser.runtime : chrome.runtime;
+  const storage = typeof browser !== 'undefined' ? browser.storage : chrome.storage;
 
   let videoId = null;
+  let userVotes = {};
   let video = null;
   let analysisData = null;
   let annotationsData = [];
@@ -191,6 +193,7 @@
       apiBaseUrl: config.apiBaseUrl,
       mistralKey: config.mistralKey,
       elevenlabsKey: config.elevenlabsKey || undefined,
+      sttProvider: config.sttProvider || 'elevenlabs',
       onStatus: (msg) => {
         updateStatusBadge('loading');
         showPlaceholder(msg);
@@ -553,6 +556,66 @@
       }
     }
 
+    const annotationId = d.id || d.annotation_id;
+    const hasId = !!annotationId;
+    const userVote = hasId ? userVotes[annotationId] : null;
+    const alreadyVoted = !!userVote;
+
+    const voteRow = document.createElement('div');
+    voteRow.className = 'mediaguard-vote-row';
+    const upvotes = d.upvotes ?? 0;
+    const downvotes = d.downvotes ?? 0;
+
+    const upBtn = document.createElement('button');
+    upBtn.className = 'mediaguard-vote-btn mediaguard-vote-up' + (userVote === 'up' ? ' active' : '');
+    upBtn.type = 'button';
+    upBtn.title = !hasId ? 'Vote when annotation is saved' : alreadyVoted ? 'Already voted' : 'Helpful';
+    upBtn.disabled = !hasId || alreadyVoted;
+    upBtn.innerHTML = '&#9650; <span class="mediaguard-vote-count">' + upvotes + '</span>';
+    upBtn.addEventListener('click', async (e) => {
+      if (!hasId || alreadyVoted) return;
+      e.preventDefault();
+      const resp = await runtime.sendMessage({ action: 'submitVote', annotationId, vote: 'up' });
+      if (resp && !resp.error) {
+        userVotes[annotationId] = 'up';
+        storage.local.set({ mediaguard_annotation_votes: userVotes });
+        mergeAnnotation(segment, resp);
+        renderOverlay();
+        const panel = overlayRoot && overlayRoot.querySelector('.mediaguard-floating-panel');
+        if (panel && panel._mediaguardSegments) {
+          const idx = panel._mediaguardSegments.indexOf(segment);
+          if (idx >= 0) updateFloatingPanel(panel._mediaguardSegments, idx, null);
+        }
+      }
+    });
+
+    const downBtn = document.createElement('button');
+    downBtn.className = 'mediaguard-vote-btn mediaguard-vote-down' + (userVote === 'down' ? ' active' : '');
+    downBtn.type = 'button';
+    downBtn.title = !hasId ? 'Vote when annotation is saved' : alreadyVoted ? 'Already voted' : 'Not helpful';
+    downBtn.disabled = !hasId || alreadyVoted;
+    downBtn.innerHTML = '&#9660; <span class="mediaguard-vote-count">' + downvotes + '</span>';
+    downBtn.addEventListener('click', async (e) => {
+      if (!hasId || alreadyVoted) return;
+      e.preventDefault();
+      const resp = await runtime.sendMessage({ action: 'submitVote', annotationId, vote: 'down' });
+      if (resp && !resp.error) {
+        userVotes[annotationId] = 'down';
+        storage.local.set({ mediaguard_annotation_votes: userVotes });
+        mergeAnnotation(segment, resp);
+        renderOverlay();
+        const panel = overlayRoot && overlayRoot.querySelector('.mediaguard-floating-panel');
+        if (panel && panel._mediaguardSegments) {
+          const idx = panel._mediaguardSegments.indexOf(segment);
+          if (idx >= 0) updateFloatingPanel(panel._mediaguardSegments, idx, null);
+        }
+      }
+    });
+
+    voteRow.appendChild(upBtn);
+    voteRow.appendChild(downBtn);
+    container.appendChild(voteRow);
+
     const btn = document.createElement('button');
     btn.className = 'mediaguard-comment-btn';
     btn.textContent = 'Add context / Report';
@@ -761,6 +824,8 @@
     } else {
       annotationsData = [];
     }
+    const voteData = await storage.local.get('mediaguard_annotation_votes');
+    userVotes = voteData.mediaguard_annotation_votes || {};
     if (annotationsData && annotationsData.length > 0) {
       mergeAnnotationsIntoAnalysis();
       renderOverlay();
@@ -783,7 +848,9 @@
           severity: 'medium',
           start: ann.timestamp_start,
           end: ann.timestamp_end,
-          id: ann.id
+          id: ann.id,
+          upvotes: ann.upvotes ?? 0,
+          downvotes: ann.downvotes ?? 0
         });
       } else {
         const existing = (analysisData.fact_checks || []).find(
@@ -797,7 +864,9 @@
           sources: ann.sources || [],
           start: ann.timestamp_start,
           end: ann.timestamp_end,
-          id: ann.id
+          id: ann.id,
+          upvotes: ann.upvotes ?? 0,
+          downvotes: ann.downvotes ?? 0
         });
       }
     });

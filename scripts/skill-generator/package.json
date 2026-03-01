@@ -8,9 +8,13 @@
     "generate:datasets": "tsx src/generate-from-datasets.ts",
     "definitions": "tsx src/run-definitions.ts",
     "evaluate": "tsx src/evaluate.ts",
+    "evaluate:benchmark": "tsx src/evaluate-benchmark.ts",
+    "benchmark": "tsx src/benchmark.ts",
+    "benchmark:sync": "tsx src/sync-dataset.ts",
     "build": "tsc"
   },
   "dependencies": {
+    "@langfuse/client": "^4.0.0",
     "@mistralai/mistralai": "^1.8.0",
     "dotenv": "^16.6.1",
     "youtubei.js": "^16.0.1",

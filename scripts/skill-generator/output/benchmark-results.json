@@ -1,0 +1,764 @@
+{
+  "timestamp": "2026-03-01T16:34:21.626Z",
+  "options": {
+    "limit": 50,
+    "useJudge": true,
+    "evalSplit": "eval50"
+  },
+  "results": [
+    {
+      "agent": "skills-dataset",
+      "samplesProcessed": 50,
+      "totalGoldSpans": 58,
+      "totalPredicted": 115,
+      "truePositives": 50,
+      "precision": 0.43478260869565216,
+      "recall": 0.8620689655172413,
+      "f1": 0.5780346820809249,
+      "judgeScore": 0.6184000000000001,
+      "judgeDetails": [
+        {
+          "articleId": "prta-sample-1",
+          "score": 1,
+          "explanation": "The predicted outputs match the gold standard exactly, identifying the same spans and techniques."
+        },
+        {
+          "articleId": "prta-sample-2",
+          "score": 0.75,
+          "explanation": "Three out of four detections are correct, but 'It's time to jail Mueller' is labeled as name-calling-labeling instead of flag-waving."
+        },
+        {
+          "articleId": "prta-sample-3",
+          "score": 1,
+          "explanation": "Predicted spans correctly identify the same manipulations as gold with overlapping quotes and correct techniques."
+        },
+        {
+          "articleId": "prta-sample-4",
+          "score": 0.5,
+          "explanation": "Partial match: Correctly identified black-and-white-fallacy but missed straw-men and red-herring in the second span."
+        },
+        {
+          "articleId": "cur-1",
+          "score": 1,
+          "explanation": "The predicted output correctly identifies the same manipulation as the gold standard with the same technique."
+        },
+        {
+          "articleId": "cur-2",
+          "score": 0.5,
+          "explanation": "Correctly identified the first span, but the second span is not an appeal-to-authority as it does not reference a specific authoritative source."
+        },
+        {
+          "articleId": "cur-3",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted spans correctly identify the appeal-to-fear-prejudice technique but split the first gold standard span into two separate spans."
+        },
+        {
+          "articleId": "cur-4",
+          "score": 0.5,
+          "explanation": "Predicted spans are more granular than gold standard, but all detected techniques are correct."
+        },
+        {
+          "articleId": "cur-5",
+          "score": 0.5,
+          "explanation": "Partial match: one technique is correct but the other is not equivalent."
+        },
+        {
+          "articleId": "cur-6",
+          "score": 0.5,
+          "explanation": "Partial match: The predicted spans correctly identify the bandwagon-reductio-ad-hitlerum technique for 'Join the majority' and 'Don't be left behind', but incorrectly labels 'Polls show 90% of Americans support this policy.' as appeal-to-authority instead of bandwagon-reductio-ad-hitlerum."
+        },
+        {
+          "articleId": "cur-7",
+          "score": 1,
+          "explanation": "The predicted spans correctly identify the same black-and-white fallacy as the gold standard, with equivalent technique detection."
+        },
+        {
+          "articleId": "cur-8",
+          "score": 1,
+          "explanation": "The predicted output correctly identifies the same manipulation as the gold standard, with the same span and technique."
+        },
+        {
+          "articleId": "cur-9",
+          "score": 0.5,
+          "explanation": "Partial match: Correctly identified 'Ban them and crime drops.' as causal-oversimplification, but misclassified 'Every mass shooter played them.' as black-and-white-fallacy instead of causal-oversimplification."
+        },
+        {
+          "articleId": "cur-10",
+          "score": 0.5,
+          "explanation": "One correct detection, one incorrect technique"
+        },
+        {
+          "articleId": "cur-11",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted output correctly identified the doubt technique but also included an incorrect appeal-to-authority technique for the first span."
+        },
+        {
+          "articleId": "cur-12",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted span is correct, but the technique is not equivalent to the gold standard."
+        },
+        {
+          "articleId": "cur-13",
+          "score": 0.5,
+          "explanation": "Correctly identified exaggeration-minimisation but incorrectly labeled loaded-language for the second span."
+        },
+        {
+          "articleId": "cur-14",
+          "score": 1,
+          "explanation": "Both predicted spans correctly identify the same manipulations as gold, with overlapping quotes and correct techniques."
+        },
+        {
+          "articleId": "cur-15",
+          "score": 0.5,
+          "explanation": "The predicted output correctly identified the flag-waving technique in the first two sentences, but it missed the flag-waving technique in the third sentence and incorrectly labeled it as a slogan."
+        },
+        {
+          "articleId": "cur-16",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted spans correctly identify 'flag-waving' and 'slogans', but 'appeal-to-fear-prejudice' is not present in the gold standard."
+        },
+        {
+          "articleId": "cur-17",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted output correctly identified the first span and technique, but the second span 'Desperate citizens fled the tyrannical government' is also marked as loaded-language, which is not present in the gold standard."
+        },
+        {
+          "articleId": "cur-18",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted spans correctly identify loaded language in the second sentence, but the first sentence is labeled as name-calling-labeling instead of loaded-language."
+        },
+        {
+          "articleId": "cur-19",
+          "score": 1,
+          "explanation": "Both predicted spans correctly identify the same manipulations as the gold standard."
+        },
+        {
+          "articleId": "cur-20",
+          "score": 1,
+          "explanation": "Both predicted spans correctly identify the same manipulations as gold standard."
+        },
+        {
+          "articleId": "cur-21",
+          "score": 0.5,
+          "explanation": "Predicted slogans instead of repetition."
+        },
+        {
+          "articleId": "cur-22",
+          "score": 0.5,
+          "explanation": "Predicted spans partially match gold standard. Missed 'That's what we need. Jobs for Americans' and misclassified 'Jobs, jobs, jobs.' as slogans."
+        },
+        {
+          "articleId": "cur-23",
+          "score": 1,
+          "explanation": "The predicted output correctly identifies the same manipulation as the gold standard, with the exact same span and technique."
+        },
+        {
+          "articleId": "cur-24",
+          "score": 1,
+          "explanation": "The predicted output correctly identifies the same manipulation as the gold standard, with the same technique."
+        },
+        {
+          "articleId": "cur-25",
+          "score": 0.5,
+          "explanation": "Partial match. Correctly identified 'It is what it is' as thought-terminating-cliches. Incorrectly labeled 'No point debating it further' as thought-terminating-cliches and 'Everyone has their own truth anyway' as black-and-white-fallacy."
+        },
+        {
+          "articleId": "cur-26",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted spans correctly identify thought-terminating cliches but split them into three separate quotes, while the gold standard combines the first two into one."
+        },
+        {
+          "articleId": "cur-27",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted span correctly identifies 'whataboutism-straw-men-red-herring' for 'But what about the opposition?' but misses the rest of the sentence which is also a part of the manipulation."
+        },
+        {
+          "articleId": "cur-28",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted spans correctly identify some manipulations but missed the whataboutism-straw-men-red-herring technique in the gold standard. Additionally, some techniques in the prediction are not present in the gold standard."
+        },
+        {
+          "articleId": "cur-29",
+          "score": 0.67,
+          "explanation": "The predicted output correctly identified two out of three manipulations, but misclassified one span as appeal-to-authority when it should not have been labeled."
+        },
+        {
+          "articleId": "cur-30",
+          "score": 0.5,
+          "explanation": "Partial match: Correctly identified one manipulation, but 'Will society survive?' is not a clear example of appeal-to-fear-prejudice."
+        },
+        {
+          "articleId": "cur-31",
+          "score": 0.5,
+          "explanation": "The predicted output correctly identifies the reductio-ad-hitlerum technique but misses the bandwagon aspect. It also misclassifies the second part as loaded-language instead of bandwagon-reductio-ad-hitlerum."
+        },
+        {
+          "articleId": "cur-32",
+          "score": 0.5,
+          "explanation": "The predicted spans correctly identify the black-and-white fallacy, but the gold standard expects a single combined span for the first three sentences, not separate ones."
+        },
+        {
+          "articleId": "cur-33",
+          "score": 0.5,
+          "explanation": "Correctly identified causal-oversimplification in the first two spans, but 'Simple economics.' is not a thought-terminating cliche."
+        },
+        {
+          "articleId": "cur-34",
+          "score": 0,
+          "explanation": "Neither predicted technique matches the gold standard."
+        },
+        {
+          "articleId": "cur-35",
+          "score": 0.5,
+          "explanation": "The predicted output includes an additional phrase 'Certainly not a scandal.' which is not labeled in the gold standard, indicating a partial match."
+        },
+        {
+          "articleId": "cur-36",
+          "score": 0.5,
+          "explanation": "The predicted output correctly identified 'flag-waving' for the first part of the text, but it missed the 'flag-waving' technique for the second part and incorrectly labeled it as 'loaded-language'."
+        },
+        {
+          "articleId": "cur-37",
+          "score": 1,
+          "explanation": "The predicted spans correctly identify the same manipulations as the gold standard, with equivalent techniques."
+        },
+        {
+          "articleId": "cur-38",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted spans correctly identify name-calling-labeling, but the second span is labeled as loaded-language instead of name-calling-labeling."
+        },
+        {
+          "articleId": "cur-39",
+          "score": 0.5,
+          "explanation": "Predicted spans correctly identify repetition but misses the full gold standard span. Additionally, 'Freedom above all.' is correctly identified as a slogan, but this technique is not present in the gold standard."
+        },
+        {
+          "articleId": "cur-40",
+          "score": 1,
+          "explanation": "The predicted output correctly identifies the slogan 'Yes we can!' and matches the gold standard."
+        },
+        {
+          "articleId": "cur-41",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted spans correctly identify thought-terminating-cliches and appeal-to-tradition, but the gold standard expects the first two phrases to be combined into a single thought-terminating-cliches span."
+        },
+        {
+          "articleId": "cur-42",
+          "score": 0.5,
+          "explanation": "The predicted spans are correct, but the gold standard expects a single span for the entire sentence."
+        },
+        {
+          "articleId": "cur-43",
+          "score": 0.5,
+          "explanation": "The predicted spans correctly identify the appeal-to-authority technique but split the sentence into two separate spans, which is not as precise as the gold standard."
+        },
+        {
+          "articleId": "cur-44",
+          "score": 0.5,
+          "explanation": "Partial match: predicted spans are correct but gold standard expects a single span for the first two sentences."
+        },
+        {
+          "articleId": "cur-45",
+          "score": 0.5,
+          "explanation": "Partial match: Correctly identified 'bandwagon-reductio-ad-hitlerum' but missed 'flag-waving' and misclassified 'slogans'."
+        },
+        {
+          "articleId": "cur-46",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted output correctly identifies the black-and-white fallacy but misses the second part of the sentence 'There is no in-between'."
+        }
+      ],
+      "perTechnique": {
+        "loaded-language": {
+          "tp": 4,
+          "fp": 6,
+          "fn": 0,
+          "precision": 0.4,
+          "recall": 1,
+          "f1": 0.5714285714285715
+        },
+        "appeal-to-authority": {
+          "tp": 4,
+          "fp": 7,
+          "fn": 1,
+          "precision": 0.36363636363636365,
+          "recall": 0.8,
+          "f1": 0.5000000000000001
+        },
+        "doubt": {
+          "tp": 2,
+          "fp": 1,
+          "fn": 3,
+          "precision": 0.6666666666666666,
+          "recall": 0.4,
+          "f1": 0.5
+        },
+        "exaggeration-minimisation": {
+          "tp": 4,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8,
+          "recall": 1,
+          "f1": 0.888888888888889
+        },
+        "flag-waving": {
+          "tp": 4,
+          "fp": 2,
+          "fn": 0,
+          "precision": 0.6666666666666666,
+          "recall": 1,
+          "f1": 0.8
+        },
+        "slogans": {
+          "tp": 3,
+          "fp": 10,
+          "fn": 1,
+          "precision": 0.23076923076923078,
+          "recall": 0.75,
+          "f1": 0.3529411764705882
+        },
+        "name-calling-labeling": {
+          "tp": 4,
+          "fp": 5,
+          "fn": 0,
+          "precision": 0.4444444444444444,
+          "recall": 1,
+          "f1": 0.6153846153846153
+        },
+        "appeal-to-fear-prejudice": {
+          "tp": 4,
+          "fp": 10,
+          "fn": 1,
+          "precision": 0.2857142857142857,
+          "recall": 0.8,
+          "f1": 0.4210526315789473
+        },
+        "causal-oversimplification": {
+          "tp": 4,
+          "fp": 3,
+          "fn": 0,
+          "precision": 0.5714285714285714,
+          "recall": 1,
+          "f1": 0.7272727272727273
+        },
+        "black-and-white-fallacy": {
+          "tp": 5,
+          "fp": 9,
+          "fn": 0,
+          "precision": 0.35714285714285715,
+          "recall": 1,
+          "f1": 0.5263157894736842
+        },
+        "whataboutism-straw-men-red-herring": {
+          "tp": 3,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75
+        },
+        "bandwagon-reductio-ad-hitlerum": {
+          "tp": 4,
+          "fp": 2,
+          "fn": 0,
+          "precision": 0.6666666666666666,
+          "recall": 1,
+          "f1": 0.8
+        },
+        "repetition": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "thought-terminating-cliches": {
+          "tp": 3,
+          "fp": 5,
+          "fn": 0,
+          "precision": 0.375,
+          "recall": 1,
+          "f1": 0.5454545454545454
+        }
+      }
+    },
+    {
+      "agent": "skills-youtube",
+      "samplesProcessed": 50,
+      "totalGoldSpans": 58,
+      "totalPredicted": 90,
+      "truePositives": 0,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "judgeScore": 0.37,
+      "judgeDetails": [
+        {
+          "articleId": "prta-sample-1",
+          "score": 0.5,
+          "explanation": "The predicted output correctly identified the doubt technique in the last sentence but missed the loaded language and appeal to authority techniques present in the gold standard. Additionally, it incorrectly labeled the doubt technique as false equivalence."
+        },
+        {
+          "articleId": "prta-sample-2",
+          "score": 0,
+          "explanation": "No correct techniques identified, all techniques are wrong or missed."
+        },
+        {
+          "articleId": "prta-sample-3",
+          "score": 0.5,
+          "explanation": "Correct techniques detected but in different language (French) and one manipulation missed."
+        },
+        {
+          "articleId": "prta-sample-4",
+          "score": 0,
+          "explanation": "No overlap with gold standard detections and incorrect technique identified."
+        },
+        {
+          "articleId": "cur-1",
+          "score": 0.5,
+          "explanation": "Correct technique detected but not in the same language as gold standard."
+        },
+        {
+          "articleId": "cur-2",
+          "score": 0.5,
+          "explanation": "Partial match. One technique is correctly identified as appeal-to-authority, but the other is misclassified as appel-a-la-peur instead of appeal-to-authority."
+        },
+        {
+          "articleId": "cur-3",
+          "score": 0.5,
+          "explanation": "The predicted techniques are not equivalent to the gold standard and the spans are not overlapping."
+        },
+        {
+          "articleId": "cur-4",
+          "score": 0.7,
+          "explanation": "Correct techniques but different labels (appel-a-la-peur vs appeal-to-fear-prejudice) and missed the connection between the first two sentences."
+        },
+        {
+          "articleId": "cur-5",
+          "score": 0.5,
+          "explanation": "One technique is correctly identified, but the other is not equivalent."
+        },
+        {
+          "articleId": "cur-6",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted spans correctly identify some manipulations but miss the 'bandwagon-reductio-ad-hitlerum' technique in the first part of the text and misclassify 'Join the majority' as 'false-dichotomy' instead of 'bandwagon-reductio-ad-hitlerum'."
+        },
+        {
+          "articleId": "cur-7",
+          "score": 0.5,
+          "explanation": "The predicted techniques are not equivalent to the gold standard. 'fausse-dichotomie' is not equivalent to 'black-and-white-fallacy', and 'appel-a-la-peur' is not a correct technique for the given text."
+        },
+        {
+          "articleId": "cur-8",
+          "score": 0.5,
+          "explanation": "The predicted span is correct, but the technique 'fausse-dichotomie' is not equivalent to 'black-and-white-fallacy'."
+        },
+        {
+          "articleId": "cur-9",
+          "score": 0.5,
+          "explanation": "Partial match. 'fausse-causalite' is equivalent to 'causal-oversimplification', but 'montee-en-generalite' is not the correct technique for the second span."
+        },
+        {
+          "articleId": "cur-10",
+          "score": 0.5,
+          "explanation": "The predicted output identified the same spans but used a different technique name. The technique 'fausse-causalite' is not equivalent to 'causal-oversimplification'."
+        },
+        {
+          "articleId": "cur-11",
+          "score": 0.5,
+          "explanation": "Correct technique detected but not equivalent, and missed part of the span."
+        },
+        {
+          "articleId": "cur-12",
+          "score": 0.5,
+          "explanation": "Partial match. 'The election was stolen' is correctly identified but the technique is not equivalent. The second span is correctly identified as a manipulation but the technique is not equivalent."
+        },
+        {
+          "articleId": "cur-13",
+          "score": 0.5,
+          "explanation": "The predicted techniques do not match the gold standard. The first span's technique is incorrect, and the second span's technique is also incorrect."
+        },
+        {
+          "articleId": "cur-14",
+          "score": 0.5,
+          "explanation": "The predicted techniques are not equivalent to the gold standard, and the second span's technique is incorrect."
+        },
+        {
+          "articleId": "cur-15",
+          "score": 0,
+          "explanation": "All predicted techniques are incorrect and do not match the gold standard."
+        },
+        {
+          "articleId": "cur-16",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted techniques are not equivalent to the gold standard."
+        },
+        {
+          "articleId": "cur-17",
+          "score": 0,
+          "explanation": "Predicted techniques do not match gold standard techniques."
+        },
+        {
+          "articleId": "cur-18",
+          "score": 0,
+          "explanation": "The predicted technique 'montee-en-generalite' is incorrect and does not match the gold standard technique 'loaded-language'. Additionally, the predicted span does not cover the entire manipulative phrase identified in the gold standard."
+        },
+        {
+          "articleId": "cur-19",
+          "score": 0.5,
+          "explanation": "Correct spans but technique not equivalent"
+        },
+        {
+          "articleId": "cur-20",
+          "score": 0.5,
+          "explanation": "One technique is correctly identified, but the other is misclassified."
+        },
+        {
+          "articleId": "cur-21",
+          "score": 0,
+          "explanation": "No techniques were predicted, while the gold standard identified repetition."
+        },
+        {
+          "articleId": "cur-22",
+          "score": 0,
+          "explanation": "The predicted technique is incorrect and does not overlap with the gold standard."
+        },
+        {
+          "articleId": "cur-23",
+          "score": 0,
+          "explanation": "The predicted technique 'appel-a-la-peur' (appeal to fear) is not equivalent to the gold standard technique 'slogans'."
+        },
+        {
+          "articleId": "cur-24",
+          "score": 0.5,
+          "explanation": "The predicted span matches the gold standard, but the technique is different. The gold standard identifies it as a slogan, while the predicted output identifies it as emotional appeal."
+        },
+        {
+          "articleId": "cur-25",
+          "score": 0.5,
+          "explanation": "Partial match: missed 'thought-terminating-cliches' and misclassified 'false-dichotomie'."
+        },
+        {
+          "articleId": "cur-26",
+          "score": 0.5,
+          "explanation": "The predicted span is partially correct but misidentifies the technique as false-dichotomy instead of thought-terminating-cliches."
+        },
+        {
+          "articleId": "cur-27",
+          "score": 0.5,
+          "explanation": "The predicted output correctly identifies the manipulative text span but misclassifies the technique as false equivalence instead of whataboutism-straw-men-red-herring."
+        },
+        {
+          "articleId": "cur-28",
+          "score": 0.5,
+          "explanation": "Partial match: Correctly identified fear appeal and false causality, but missed straw man and red herring. Also, the generalization technique is not present in the gold standard."
+        },
+        {
+          "articleId": "cur-29",
+          "score": 0.5,
+          "explanation": "Partial match. Correctly identified authority appeal but missed doubt technique and misclassified appeal-to-authority as appel-a-la-peur."
+        },
+        {
+          "articleId": "cur-30",
+          "score": 0.5,
+          "explanation": "Correct technique detected but not equivalent to gold standard. Additional incorrect detections."
+        },
+        {
+          "articleId": "cur-31",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted techniques are not equivalent to the gold standard. 'denigrement-de-l-adversaire' is not the same as 'bandwagon-reductio-ad-hitlerum', and 'desinformation' is not a valid technique for the given context."
+        },
+        {
+          "articleId": "cur-32",
+          "score": 0.8,
+          "explanation": "The predicted spans correctly identify the same manipulations as gold, but uses a different label (fausse-dichotomie instead of black-and-white-fallacy)."
+        },
+        {
+          "articleId": "cur-33",
+          "score": 0.5,
+          "explanation": "The predicted techniques are not equivalent to the gold standard, and the spans do not fully overlap."
+        },
+        {
+          "articleId": "cur-34",
+          "score": 0.5,
+          "explanation": "Partial match: 'utilisation-de-l-autorite' is not equivalent to 'doubt', and 'montee-en-generalite' is not detected in the gold standard."
+        },
+        {
+          "articleId": "cur-35",
+          "score": 0,
+          "explanation": "No techniques were predicted, while the gold standard identified one."
+        },
+        {
+          "articleId": "cur-36",
+          "score": 0,
+          "explanation": "The predicted technique 'appel-a-la-peur' (appeal to fear) is not equivalent to the gold standard technique 'flag-waving'."
+        },
+        {
+          "articleId": "cur-37",
+          "score": 0.5,
+          "explanation": "Partial match. The predicted span is not equivalent to the gold standard span, and the technique is different."
+        },
+        {
+          "articleId": "cur-38",
+          "score": 0.5,
+          "explanation": "Partial match: Correct spans but wrong techniques"
+        },
+        {
+          "articleId": "cur-39",
+          "score": 0,
+          "explanation": "No techniques were predicted, but the gold standard identified a repetition technique."
+        },
+        {
+          "articleId": "cur-40",
+          "score": 0,
+          "explanation": "No techniques were predicted, but the gold standard expected a slogan technique."
+        },
+        {
+          "articleId": "cur-41",
+          "score": 0,
+          "explanation": "No correct techniques identified."
+        },
+        {
+          "articleId": "cur-42",
+          "score": 0.5,
+          "explanation": "Predicted spans are correct but techniques are not equivalent to gold standard."
+        },
+        {
+          "articleId": "cur-43",
+          "score": 0.5,
+          "explanation": "Correct techniques identified but not equivalent terms used."
+        },
+        {
+          "articleId": "cur-44",
+          "score": 0.5,
+          "explanation": "Correct techniques but different labels and missed overlap."
+        },
+        {
+          "articleId": "cur-45",
+          "score": 0,
+          "explanation": "No correct techniques identified."
+        },
+        {
+          "articleId": "cur-46",
+          "score": 0.5,
+          "explanation": "The predicted span is similar but not identical to the gold standard, and the technique name is equivalent but not identical."
+        }
+      ],
+      "perTechnique": {
+        "loaded-language": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "appeal-to-authority": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "doubt": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "exaggeration-minimisation": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "flag-waving": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "slogans": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "name-calling-labeling": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "appeal-to-fear-prejudice": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "causal-oversimplification": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "black-and-white-fallacy": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "whataboutism-straw-men-red-herring": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "bandwagon-reductio-ad-hitlerum": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "repetition": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 3,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        },
+        "thought-terminating-cliches": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 3,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0
+        }
+      }
+    }
+  ]
+}

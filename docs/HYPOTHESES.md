@@ -106,8 +106,7 @@ MediaGuard uses large language models (LLMs) to detect rhetorical manipulation t
 
 ## Results
 
-Evaluation run on 2026-03-01 with SemEval validation split (2 sample articles, 5 gold spans).
-*Note: Sample set is small (PRTA Table 1 examples); full SemEval validation would yield more robust metrics.*
+Evaluation run on 2026-03-01. See `docs/CONCLUSION.md` for the full 50-item benchmark.
 
 | Hypothesis | Metric | Expected | Actual | Supported? |
 |------------|--------|----------|--------|------------|

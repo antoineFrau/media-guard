@@ -32,7 +32,9 @@ model Annotation {
   sources       Json     @default("[]")
   userComments  Json     @default("[]")
   version       Int      @default(1)
-  createdAt     DateTime @default(now())
+  upvotes      Int       @default(0)
+  downvotes    Int       @default(0)
+  createdAt    DateTime  @default(now())
   updatedAt     DateTime @updatedAt
 
   comments AnnotationComment[]

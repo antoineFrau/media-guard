@@ -30,7 +30,7 @@ function extractSection(content: string, heading: string): string {
 
 export async function loadSkills(
   skillsDir: string = join(process.cwd(), "scripts/skill-generator/output/skills-dataset"),
-  maxSkills: number = 5
+  maxSkills?: number
 ): Promise<LoadedSkill[]> {
   let entries: { name: string; isDirectory: () => boolean }[] = [];
   try {
@@ -41,7 +41,10 @@ export async function loadSkills(
   }
 
   const skills: LoadedSkill[] = [];
-  const dirs = entries.filter((e) => e.isDirectory()).slice(0, maxSkills);
+  const dirs =
+    maxSkills === undefined
+      ? entries.filter((e) => e.isDirectory())
+      : entries.filter((e) => e.isDirectory()).slice(0, maxSkills);
   for (const entry of dirs) {
     const skillPath = join(skillsDir, entry.name, "SKILL.md");
     let content: string;
@@ -79,4 +82,39 @@ export function buildSkillsContext(skills: LoadedSkill[]): string {
         (s.examples ? `**Examples:**\n${s.examples}\n` : "")
     )
     .join("\n");
+}
+
+/** Compact catalog for Phase 1 skill selection (slug, name, description only). */
+export function buildSkillCatalog(skills: LoadedSkill[]): Array<{ slug: string; name: string; description: string }> {
+  return skills.map((s) => ({
+    slug: s.slug,
+    name: s.name,
+    description: s.description,
+  }));
+}
+
+/**
+ * Load skills and return context string only for the given slugs.
+ * Used in Phase 3 with skills selected by Phase 1.
+ * Falls back to all skills if slugs is empty or if none match.
+ */
+export async function getSkillsContextForSlugs(
+  slugs: string[],
+  skillsDir?: string
+): Promise<string> {
+  const allSkills = await loadSkills(skillsDir, undefined);
+  if (allSkills.length === 0) return "";
+
+  const slugSet = new Set(slugs.map((s) => s.trim().toLowerCase()));
+  const filtered =
+    slugSet.size > 0
+      ? allSkills.filter((s) => slugSet.has(s.slug.toLowerCase()))
+      : allSkills;
+
+  if (filtered.length === 0) {
+    console.warn(`[skills] No matching skills for slugs [${slugs.join(", ")}], using all ${allSkills.length} skills`);
+    return buildSkillsContext(allSkills);
+  }
+
+  return buildSkillsContext(filtered);
 }

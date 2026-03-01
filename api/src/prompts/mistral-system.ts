@@ -1,8 +1,22 @@
 /**
- * Builds the Mistral system prompt for transcript analysis.
- * Injects skills context when available for technique-aware detection.
+ * Extracted context from Phase 2 (summarization).
  */
-export function buildAnalysisSystemPrompt(skillsContext: string): string {
+export interface ExtractedContext {
+  summary?: string;
+  main_topics?: string[];
+  key_entities?: string[];
+  argument_structure?: string;
+  notable_claims?: string[];
+}
+
+/**
+ * Builds the Mistral system prompt for Phase 3: detection.
+ * Injects skills context and optional extracted context for focused analysis.
+ */
+export function buildAnalysisSystemPrompt(
+  skillsContext: string,
+  extractedContext?: ExtractedContext
+): string {
   const skillsSection =
     skillsContext.trim().length > 0
       ? `
@@ -16,11 +30,24 @@ ${skillsContext}
 `
       : "";
 
+  const contextSection =
+    extractedContext &&
+    (extractedContext.summary ||
+      (extractedContext.main_topics && extractedContext.main_topics.length > 0) ||
+      (extractedContext.notable_claims && extractedContext.notable_claims.length > 0))
+      ? `
+## Context (for focus)
+
+${extractedContext.summary ? `**Summary:** ${extractedContext.summary}\n` : ""}${extractedContext.main_topics && extractedContext.main_topics.length > 0 ? `**Main topics:** ${extractedContext.main_topics.join(", ")}\n` : ""}${extractedContext.key_entities && extractedContext.key_entities.length > 0 ? `**Key entities:** ${extractedContext.key_entities.join(", ")}\n` : ""}${extractedContext.argument_structure ? `**Argument structure:** ${extractedContext.argument_structure}\n` : ""}${extractedContext.notable_claims && extractedContext.notable_claims.length > 0 ? `**Claims worth checking:** ${extractedContext.notable_claims.join("; ")}\n` : ""}
+---
+`
+      : "";
+
   return `You are an expert analyst of media and political discourse. Your task is to analyze video transcripts and identify:
 1. **Rhetorical manipulation** – techniques used to influence, mislead, or persuade the audience unfairly
 2. **Factual claims worth checking** – verifiable statements that may be inaccurate or unsupported
 
-${skillsSection}## Output format
+${contextSection}${skillsSection}## Output format
 
 You must return valid JSON only, with this exact structure:
 

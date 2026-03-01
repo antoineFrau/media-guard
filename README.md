@@ -11,7 +11,7 @@ Backend for MediaGuard: video analysis (manipulation + fact-check detection), an
 ## Quick Start
 
 ```bash
-# 1. Start PostgreSQL
+# 1. Start PostgreSQL (and optionally Langfuse for tracing)
 docker compose up -d
 
 # 2. Run migrations
@@ -44,6 +44,8 @@ DATABASE_URL="postgresql://mediaguard:mediaguard@localhost:5432/mediaguard"
 ```
 
 Optional: `MISTRAL_API_KEY` for server-side analysis. Otherwise send `X-Mistral-API-Key` header per request (BYOK).
+
+For Langfuse tracing: `LANGFUSE_SECRET_KEY` (and optionally `LANGFUSE_PUBLIC_KEY`). When set, each `/analyze` and `/video/:id/analysis` request is traced with Mistral generations. Run `docker compose up -d` to start self-hosted Langfuse at http://localhost:3100.
 
 ## Seeded Data
 
@@ -85,9 +87,9 @@ npm run skill:generate -- --fetch-only --last=2   # Test YouTube fetch without M
 - If "No videos found on channel", set `MEDIAGUARD_VIDEO_IDS=id1,id2,id3` to use specific video IDs (bypasses channel fetch).
 - Transcripts use the internal `get_transcript` API (from [mcp-server-youtube-transcript](https://github.com/kimtaeyoon83/mcp-server-youtube-transcript)) — more reliable than youtubei.js for captions.
 
-## STT App (Version 1 – offline transcription)
+## STT App
 
-Standalone web app for offline speech-to-text using [Kyutai STT](https://github.com/lucky-bai/wasm-speech-streaming) (WASM). Captures mic or tab audio, transcribes in real time, then sends to MediaGuard API for analysis.
+Standalone web app for real-time speech-to-text. Options: **ElevenLabs** (cloud), **Mistral Voxtral** (cloud via API proxy), or **Moshi** (offline WASM). Captures mic or tab audio, transcribes in real time, then sends to MediaGuard API for analysis.
 
 **Prerequisites:** Rust, `wasm32-unknown-unknown`, `wasm-bindgen-cli` (see [wasm-speech-streaming](https://github.com/lucky-bai/wasm-speech-streaming#prerequisites)).
 

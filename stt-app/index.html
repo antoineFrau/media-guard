@@ -59,12 +59,13 @@
     <span class="provider-toggle">
       <label><input type="radio" name="provider" value="local" checked /> Local (Moshi)</label>
       <label><input type="radio" name="provider" value="elevenlabs" /> ElevenLabs (cloud)</label>
+      <label><input type="radio" name="provider" value="mistral" /> Mistral Voxtral (cloud)</label>
     </span>
     <button id="speech-btn" class="btn-primary">Start transcription</button>
     <button id="analyze-btn" class="btn-analyze" disabled>Analyze with MediaGuard</button>
   </div>
 
-  <div class="status" id="status">Choose ElevenLabs + Tab, start transcription. Audio streams to ElevenLabs; after 1 min, analysis is auto-sent to Mistral.</div>
+  <div class="status" id="status">Choose ElevenLabs or Mistral + Tab, start transcription. Audio streams to cloud; after 1 min, analysis is auto-sent.</div>
 
   <div id="diagnostics" class="diagnostics" hidden>
     <h3>Diagnostics (validate audio flow)</h3>

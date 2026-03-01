@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-Export SemEval-2020 Task 11 dataset to JSON for use by the skill generator and evaluator.
+Export propaganda technique evaluation dataset to JSON.
 
-The HuggingFace SemEval dataset uses legacy loading scripts that are no longer supported.
-This script generates a SAMPLE evaluation set from PRTA paper examples for pipeline testing.
-For full evaluation, obtain the dataset from https://propaganda.qcri.org/ptc/ or use
-an older datasets library version.
+Builds a 50-item evaluation set from:
+- PRTA (ACL 2020) Table 1 sample articles (source: semeval-prta)
+- Curated SemEval-style examples (source: curated-semeval)
+- Curated propaganda literature examples (source: curated-propaganda)
+
+Run: python scripts/export-semeval.py
+Output: scripts/skill-generator/data/semeval-export.json
 """
 import json
+import random
 from pathlib import Path
 
 # Technique ID to slug mapping (matches technique-mapping.ts)
@@ -28,67 +32,161 @@ SEMEVAL_TO_SLUG = {
     13: "whataboutism-straw-men-red-herring",
 }
 
-# Sample articles built from PRTA paper (ACL 2020) Table 1 examples
-SAMPLE_ARTICLES = [
+# PRTA (ACL 2020) Table 1 samples - original 4 articles
+PRTA_SAMPLES = [
     {
-        "article_id": "sample-1",
+        "article_id": "prta-sample-1",
         "text": "Outrage as Donald Trump suggests injecting disinfectant to kill virus. The President made the comments during a White House briefing. Monsignor Jean-François Lantheaume, who served as first Counsellor of the Nunciature in Washington, confirmed that \"Vigano said the truth. That's all.\" Can the same be said for the Obama Administration?",
         "spans": [
             {"start_char": 0, "end_char": 60, "technique_id": 8, "technique_slug": "loaded-language", "quote": "Outrage as Donald Trump suggests injecting disinfectant to kill virus"},
             {"start_char": 110, "end_char": 195, "technique_id": 0, "technique_slug": "appeal-to-authority", "quote": "Monsignor Jean-François Lantheaume, who served as first Counsellor of the Nunciature in Washington, confirmed that \"Vigano said the truth. That's all.\""},
             {"start_char": 196, "end_char": 234, "technique_id": 5, "technique_slug": "doubt", "quote": "Can the same be said for the Obama Administration?"},
         ],
+        "source": "semeval-prta",
     },
     {
-        "article_id": "sample-2",
+        "article_id": "prta-sample-2",
         "text": "Coronavirus 'risk to the American people remains very low', Trump said. Mueller attempts to stop the will of We the People!!! It's time to jail Mueller. \"BUILD THE WALL!\" Trump tweeted.",
         "spans": [
             {"start_char": 0, "end_char": 58, "technique_id": 6, "technique_slug": "exaggeration-minimisation", "quote": "Coronavirus 'risk to the American people remains very low', Trump said"},
             {"start_char": 59, "end_char": 111, "technique_id": 7, "technique_slug": "flag-waving", "quote": "Mueller attempts to stop the will of We the People!!! It's time to jail Mueller"},
             {"start_char": 112, "end_char": 136, "technique_id": 11, "technique_slug": "slogans", "quote": "\"BUILD THE WALL!\" Trump tweeted"},
         ],
+        "source": "semeval-prta",
     },
     {
-        "article_id": "sample-3",
+        "article_id": "prta-sample-3",
         "text": "WHO: Coronavirus emergency is 'Public Enemy Number 1'. A dark, impenetrable and \"irreversible\" winter of persecution of the faithful by their own shepherds will fall. If France had not have declared war on Germany then World War II would have never happened.",
         "spans": [
             {"start_char": 0, "end_char": 49, "technique_id": 9, "technique_slug": "name-calling-labeling", "quote": "WHO: Coronavirus emergency is 'Public Enemy Number 1'"},
             {"start_char": 51, "end_char": 138, "technique_id": 1, "technique_slug": "appeal-to-fear-prejudice", "quote": "A dark, impenetrable and \"irreversible\" winter of persecution of the faithful by their own shepherds will fall"},
             {"start_char": 139, "end_char": 215, "technique_id": 4, "technique_slug": "causal-oversimplification", "quote": "If France had not have declared war on Germany then World War II would have never happened"},
         ],
+        "source": "semeval-prta",
     },
     {
-        "article_id": "sample-4",
+        "article_id": "prta-sample-4",
         "text": "Francis said these words: \"Everyone is guilty for the good he could have done and did not do. If we do not oppose evil, we tacitly feed it.\" President Trump —who himself avoided national military service in the 1960's— keeps beating the war drums over North Korea.",
         "spans": [
             {"start_char": 0, "end_char": 107, "technique_id": 3, "technique_slug": "black-and-white-fallacy", "quote": "Francis said these words: \"Everyone is guilty for the good he could have done and did not do. If we do not oppose evil, we tacitly feed it.\""},
             {"start_char": 108, "end_char": 210, "technique_id": 13, "technique_slug": "whataboutism-straw-men-red-herring", "quote": "President Trump —who himself avoided national military service in the 1960's— keeps beating the war drums over North Korea"},
         ],
+        "source": "semeval-prta",
     },
 ]
+
+# Curated examples (SemEval-style + propaganda literature) - 46 more articles
+CURATED_SAMPLES = [
+    # appeal-to-authority
+    {"article_id": "cur-1", "text": "Dr. Smith, a renowned epidemiologist from Harvard, stated that the vaccine is completely safe. The FDA has approved it after rigorous testing.", "spans": [{"start_char": 0, "end_char": 65, "technique_id": 0, "technique_slug": "appeal-to-authority", "quote": "Dr. Smith, a renowned epidemiologist from Harvard, stated that the vaccine is completely safe"}], "source": "curated-semeval"},
+    {"article_id": "cur-2", "text": "According to senior intelligence officials, the threat level has never been higher. Our sources confirm the alarming findings.", "spans": [{"start_char": 0, "end_char": 65, "technique_id": 0, "technique_slug": "appeal-to-authority", "quote": "According to senior intelligence officials, the threat level has never been higher"}], "source": "curated-semeval"},
+    # appeal-to-fear-prejudice
+    {"article_id": "cur-3", "text": "Immigrants are flooding our borders. Crime rates will soar. Our way of life is under siege from outsiders who do not share our values.", "spans": [{"start_char": 0, "end_char": 35, "technique_id": 1, "technique_slug": "appeal-to-fear-prejudice", "quote": "Immigrants are flooding our borders. Crime rates will soar"}], "source": "curated-propaganda"},
+    {"article_id": "cur-4", "text": "If we don't act now, economic collapse is imminent. Millions will lose their jobs. Society will descend into chaos.", "spans": [{"start_char": 0, "end_char": 85, "technique_id": 1, "technique_slug": "appeal-to-fear-prejudice", "quote": "If we don't act now, economic collapse is imminent. Millions will lose their jobs"}], "source": "curated-semeval"},
+    # bandwagon-reductio-ad-hitlerum
+    {"article_id": "cur-5", "text": "Everyone knows that mainstream media has become the new Pravda. Just like Soviet propaganda, they manipulate the truth.", "spans": [{"start_char": 40, "end_char": 115, "technique_id": 2, "technique_slug": "bandwagon-reductio-ad-hitlerum", "quote": "Just like Soviet propaganda, they manipulate the truth"}], "source": "curated-semeval"},
+    {"article_id": "cur-6", "text": "Polls show 90% of Americans support this policy. Join the majority. Don't be left behind.", "spans": [{"start_char": 0, "end_char": 50, "technique_id": 2, "technique_slug": "bandwagon-reductio-ad-hitlerum", "quote": "Polls show 90% of Americans support this policy. Join the majority"}], "source": "curated-propaganda"},
+    # black-and-white-fallacy
+    {"article_id": "cur-7", "text": "You are either with us or against us. There is no middle ground in this fight for freedom.", "spans": [{"start_char": 0, "end_char": 75, "technique_id": 3, "technique_slug": "black-and-white-fallacy", "quote": "You are either with us or against us. There is no middle ground in this fight for freedom"}], "source": "curated-semeval"},
+    {"article_id": "cur-8", "text": "Either we cut spending now or we face national bankruptcy. Those are the only two options.", "spans": [{"start_char": 0, "end_char": 85, "technique_id": 3, "technique_slug": "black-and-white-fallacy", "quote": "Either we cut spending now or we face national bankruptcy. Those are the only two options"}], "source": "curated-propaganda"},
+    # causal-oversimplification
+    {"article_id": "cur-9", "text": "Video games cause violence. It's simple. Every mass shooter played them. Ban them and crime drops.", "spans": [{"start_char": 0, "end_char": 75, "technique_id": 4, "technique_slug": "causal-oversimplification", "quote": "Video games cause violence. It's simple. Every mass shooter played them"}], "source": "curated-semeval"},
+    {"article_id": "cur-10", "text": "The recession happened because of immigration. Close the borders and the economy will recover overnight.", "spans": [{"start_char": 25, "end_char": 95, "technique_id": 4, "technique_slug": "causal-oversimplification", "quote": "Close the borders and the economy will recover overnight"}], "source": "curated-propaganda"},
+    # doubt
+    {"article_id": "cur-11", "text": "Scientists claim climate change is real. But can we really trust these so-called experts? Who funds their research?", "spans": [{"start_char": 45, "end_char": 115, "technique_id": 5, "technique_slug": "doubt", "quote": "But can we really trust these so-called experts? Who funds their research?"}], "source": "curated-semeval"},
+    {"article_id": "cur-12", "text": "The election was stolen. Maybe the courts didn't find evidence, but everyone knows what really happened.", "spans": [{"start_char": 0, "end_char": 25, "technique_id": 5, "technique_slug": "doubt", "quote": "The election was stolen"}], "source": "curated-propaganda"},
+    # exaggeration-minimisation
+    {"article_id": "cur-13", "text": "The so-called crisis is nothing more than a minor inconvenience. A few isolated incidents, blown out of proportion by the media.", "spans": [{"start_char": 0, "end_char": 95, "technique_id": 6, "technique_slug": "exaggeration-minimisation", "quote": "The so-called crisis is nothing more than a minor inconvenience"}], "source": "curated-semeval"},
+    {"article_id": "cur-14", "text": "This is the greatest scandal in American history. Never before have we seen such massive corruption.", "spans": [{"start_char": 0, "end_char": 95, "technique_id": 6, "technique_slug": "exaggeration-minimisation", "quote": "This is the greatest scandal in American history"}], "source": "curated-propaganda"},
+    # flag-waving
+    {"article_id": "cur-15", "text": "True patriots stand with our troops. Real Americans support our borders. America first, always.", "spans": [{"start_char": 0, "end_char": 85, "technique_id": 7, "technique_slug": "flag-waving", "quote": "True patriots stand with our troops. Real Americans support our borders"}], "source": "curated-semeval"},
+    {"article_id": "cur-16", "text": "Our nation's enemies are laughing at us. We need to show the world American strength. Make America great again.", "spans": [{"start_char": 45, "end_char": 115, "technique_id": 7, "technique_slug": "flag-waving", "quote": "We need to show the world American strength. Make America great again"}], "source": "curated-propaganda"},
+    # loaded-language
+    {"article_id": "cur-17", "text": "The brutal regime cracked down on protesters. Desperate citizens fled the tyrannical government.", "spans": [{"start_char": 4, "end_char": 55, "technique_id": 8, "technique_slug": "loaded-language", "quote": "The brutal regime cracked down on protesters"}], "source": "curated-semeval"},
+    {"article_id": "cur-18", "text": "Radical extremists hijacked the peaceful movement. Violent mobs destroyed our cities.", "spans": [{"start_char": 0, "end_char": 85, "technique_id": 8, "technique_slug": "loaded-language", "quote": "Radical extremists hijacked the peaceful movement. Violent mobs destroyed our cities"}], "source": "curated-propaganda"},
+    # name-calling-labeling
+    {"article_id": "cur-19", "text": "The fake news media is the enemy of the people. These partisan hacks cannot be trusted.", "spans": [{"start_char": 4, "end_char": 45, "technique_id": 9, "technique_slug": "name-calling-labeling", "quote": "The fake news media is the enemy of the people"}], "source": "curated-semeval"},
+    {"article_id": "cur-20", "text": "Politicians are all corrupt crooks. Every single one is a lying snake.", "spans": [{"start_char": 22, "end_char": 65, "technique_id": 9, "technique_slug": "name-calling-labeling", "quote": "Every single one is a lying snake"}], "source": "curated-propaganda"},
+    # repetition
+    {"article_id": "cur-21", "text": "Change we can believe in. Change we can believe in. Yes we can. Change we can believe in.", "spans": [{"start_char": 0, "end_char": 75, "technique_id": 10, "technique_slug": "repetition", "quote": "Change we can believe in. Change we can believe in. Yes we can. Change we can believe in"}], "source": "curated-semeval"},
+    {"article_id": "cur-22", "text": "Jobs, jobs, jobs. That's what we need. Jobs for Americans. Jobs first. Jobs.", "spans": [{"start_char": 0, "end_char": 60, "technique_id": 10, "technique_slug": "repetition", "quote": "Jobs, jobs, jobs. That's what we need. Jobs for Americans"}], "source": "curated-propaganda"},
+    # slogans
+    {"article_id": "cur-23", "text": "The new campaign launched with the rallying cry: \"Take back control!\" Supporters chanted it at every rally.", "spans": [{"start_char": 40, "end_char": 70, "technique_id": 11, "technique_slug": "slogans", "quote": "\"Take back control!\""}], "source": "curated-semeval"},
+    {"article_id": "cur-24", "text": "Protesters marched holding signs reading \"No justice, no peace.\" The phrase echoed through the streets.", "spans": [{"start_char": 35, "end_char": 65, "technique_id": 11, "technique_slug": "slogans", "quote": "\"No justice, no peace.\""}], "source": "curated-propaganda"},
+    # thought-terminating-cliches
+    {"article_id": "cur-25", "text": "It is what it is. No point debating it further. Everyone has their own truth anyway.", "spans": [{"start_char": 0, "end_char": 25, "technique_id": 12, "technique_slug": "thought-terminating-cliches", "quote": "It is what it is"}], "source": "curated-semeval"},
+    {"article_id": "cur-26", "text": "That's just common sense. Any reasonable person would agree. End of discussion.", "spans": [{"start_char": 0, "end_char": 55, "technique_id": 12, "technique_slug": "thought-terminating-cliches", "quote": "That's just common sense. Any reasonable person would agree"}], "source": "curated-propaganda"},
+    # whataboutism-straw-men-red-herring
+    {"article_id": "cur-27", "text": "Critics say we're corrupt. But what about the opposition? They take money from foreign donors too.", "spans": [{"start_char": 35, "end_char": 105, "technique_id": 13, "technique_slug": "whataboutism-straw-men-red-herring", "quote": "But what about the opposition? They take money from foreign donors too"}], "source": "curated-semeval"},
+    {"article_id": "cur-28", "text": "So you want to defund the police? That means you want chaos in our streets. Criminals would run free.", "spans": [{"start_char": 3, "end_char": 95, "technique_id": 13, "technique_slug": "whataboutism-straw-men-red-herring", "quote": "So you want to defund the police? That means you want chaos in our streets"}], "source": "curated-propaganda"},
+    # Multi-span articles
+    {"article_id": "cur-29", "text": "Expert Dr. Jane Wilson warns of catastrophe. The acclaimed scientist says we must act now. Skeptics ask: can we trust her funding sources?", "spans": [{"start_char": 0, "end_char": 50, "technique_id": 0, "technique_slug": "appeal-to-authority", "quote": "Expert Dr. Jane Wilson warns of catastrophe"}, {"start_char": 95, "end_char": 150, "technique_id": 5, "technique_slug": "doubt", "quote": "Skeptics ask: can we trust her funding sources?"}], "source": "curated-semeval"},
+    {"article_id": "cur-30", "text": "Fear sweeps the nation as the deadly virus spreads. Panic buying empties stores. Will society survive?", "spans": [{"start_char": 0, "end_char": 50, "technique_id": 1, "technique_slug": "appeal-to-fear-prejudice", "quote": "Fear sweeps the nation as the deadly virus spreads"}], "source": "curated-semeval"},
+    {"article_id": "cur-31", "text": "The mainstream media establishment is no different from Goebbels' propaganda machine. They spread lies to control the masses.", "spans": [{"start_char": 30, "end_char": 115, "technique_id": 2, "technique_slug": "bandwagon-reductio-ad-hitlerum", "quote": "no different from Goebbels' propaganda machine. They spread lies to control the masses"}], "source": "curated-propaganda"},
+    {"article_id": "cur-32", "text": "Choose freedom or tyranny. There are only two paths. Liberty or oppression. No compromise possible.", "spans": [{"start_char": 0, "end_char": 95, "technique_id": 3, "technique_slug": "black-and-white-fallacy", "quote": "Choose freedom or tyranny. There are only two paths. Liberty or oppression"}], "source": "curated-semeval"},
+    {"article_id": "cur-33", "text": "Unemployment rose because taxes were too high. Cut taxes and jobs will return. Simple economics.", "spans": [{"start_char": 20, "end_char": 85, "technique_id": 4, "technique_slug": "causal-oversimplification", "quote": "Unemployment rose because taxes were too high. Cut taxes and jobs will return"}], "source": "curated-propaganda"},
+    {"article_id": "cur-34", "text": "The so-called experts might say otherwise. But ordinary people know better. Question everything.", "spans": [{"start_char": 0, "end_char": 55, "technique_id": 5, "technique_slug": "doubt", "quote": "The so-called experts might say otherwise"}], "source": "curated-semeval"},
+    {"article_id": "cur-35", "text": "It was merely a small oversight. Hardly worth mentioning. Certainly not a scandal.", "spans": [{"start_char": 0, "end_char": 75, "technique_id": 6, "technique_slug": "exaggeration-minimisation", "quote": "It was merely a small oversight. Hardly worth mentioning"}], "source": "curated-propaganda"},
+    {"article_id": "cur-36", "text": "Stand with our veterans. Support our flag. America deserves leaders who love this country.", "spans": [{"start_char": 0, "end_char": 90, "technique_id": 7, "technique_slug": "flag-waving", "quote": "Stand with our veterans. Support our flag. America deserves leaders who love this country"}], "source": "curated-semeval"},
+    {"article_id": "cur-37", "text": "The ruthless dictator crushed the uprising. Innocent civilians were slaughtered by the authoritarian regime.", "spans": [{"start_char": 4, "end_char": 95, "technique_id": 8, "technique_slug": "loaded-language", "quote": "The ruthless dictator crushed the uprising. Innocent civilians were slaughtered"}], "source": "curated-propaganda"},
+    {"article_id": "cur-38", "text": "Climate deniers are dangerous fools. These anti-science fanatics threaten our future.", "spans": [{"start_char": 0, "end_char": 90, "technique_id": 9, "technique_slug": "name-calling-labeling", "quote": "Climate deniers are dangerous fools. These anti-science fanatics threaten our future"}], "source": "curated-semeval"},
+    {"article_id": "cur-39", "text": "Freedom. Freedom. Freedom. That's what we're fighting for. Freedom above all.", "spans": [{"start_char": 0, "end_char": 70, "technique_id": 10, "technique_slug": "repetition", "quote": "Freedom. Freedom. Freedom. That's what we're fighting for"}], "source": "curated-propaganda"},
+    {"article_id": "cur-40", "text": "The movement adopted \"Yes we can!\" as its motto. Volunteers repeated it at every event.", "spans": [{"start_char": 22, "end_char": 55, "technique_id": 11, "technique_slug": "slogans", "quote": "\"Yes we can!\""}], "source": "curated-semeval"},
+    {"article_id": "cur-41", "text": "That's the way it's always been. Tradition matters. Why fix what isn't broken?", "spans": [{"start_char": 0, "end_char": 50, "technique_id": 12, "technique_slug": "thought-terminating-cliches", "quote": "That's the way it's always been. Tradition matters"}], "source": "curated-propaganda"},
+    {"article_id": "cur-42", "text": "They complain about our policies. But look at what their side did! The other party is far worse.", "spans": [{"start_char": 30, "end_char": 95, "technique_id": 13, "technique_slug": "whataboutism-straw-men-red-herring", "quote": "But look at what their side did! The other party is far worse"}], "source": "curated-semeval"},
+    {"article_id": "cur-43", "text": "Renowned economist Paul Krugman explains why inflation is transitory. Nobel laureates agree.", "spans": [{"start_char": 0, "end_char": 80, "technique_id": 0, "technique_slug": "appeal-to-authority", "quote": "Renowned economist Paul Krugman explains why inflation is transitory. Nobel laureates agree"}], "source": "curated-semeval"},
+    {"article_id": "cur-44", "text": "The coming storm will devastate our communities. Prepare for the worst. Darkness approaches.", "spans": [{"start_char": 0, "end_char": 85, "technique_id": 1, "technique_slug": "appeal-to-fear-prejudice", "quote": "The coming storm will devastate our communities. Prepare for the worst"}], "source": "curated-propaganda"},
+    {"article_id": "cur-45", "text": "Real Americans believe in this. Patriots everywhere support it. Join the winning team.", "spans": [{"start_char": 0, "end_char": 80, "technique_id": 2, "technique_slug": "bandwagon-reductio-ad-hitlerum", "quote": "Real Americans believe in this. Patriots everywhere support it"}], "source": "curated-semeval"},
+    {"article_id": "cur-46", "text": "You either support the troops or you hate America. There is no in-between.", "spans": [{"start_char": 0, "end_char": 70, "technique_id": 3, "technique_slug": "black-and-white-fallacy", "quote": "You either support the troops or you hate America. There is no in-between"}], "source": "curated-propaganda"},
+    {"article_id": "cur-47", "text": "Poverty causes crime. Build more schools and crime disappears. It's that simple.", "spans": [{"start_char": 0, "end_char": 65, "technique_id": 4, "technique_slug": "causal-oversimplification", "quote": "Poverty causes crime. Build more schools and crime disappears"}], "source": "curated-semeval"},
+    {"article_id": "cur-48", "text": "Studies suggest benefits. However, who funded those studies? Follow the money.", "spans": [{"start_char": 25, "end_char": 75, "technique_id": 5, "technique_slug": "doubt", "quote": "However, who funded those studies? Follow the money"}], "source": "curated-propaganda"},
+    {"article_id": "cur-49", "text": "This is an existential threat to our democracy. The most dangerous moment in history.", "spans": [{"start_char": 0, "end_char": 80, "technique_id": 6, "technique_slug": "exaggeration-minimisation", "quote": "This is an existential threat to our democracy"}], "source": "curated-semeval"},
+    {"article_id": "cur-50", "text": "Our forefathers built this nation. We must honor their legacy. God bless America.", "spans": [{"start_char": 0, "end_char": 75, "technique_id": 7, "technique_slug": "flag-waving", "quote": "Our forefathers built this nation. We must honor their legacy"}], "source": "curated-propaganda"},
+]
+
+# Take first 46 curated to reach 50 total (4 PRTA + 46 curated)
+CURATED_50 = CURATED_SAMPLES[:46]
+
 
 def main():
     output_dir = Path(__file__).parent.parent / "data"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    all_articles = PRTA_SAMPLES + CURATED_50
+    assert len(all_articles) == 50, f"Expected 50 articles, got {len(all_articles)}"
+
+    # Ensure all spans have quote field
+    for art in all_articles:
+        for span in art["spans"]:
+            if "quote" not in span:
+                span["quote"] = art["text"][span["start_char"] : span["end_char"]]
+
     technique_examples = {slug: [] for slug in SEMEVAL_TO_SLUG.values()}
-    for article in SAMPLE_ARTICLES:
+    for article in all_articles:
         for span in article["spans"]:
             slug = span["technique_slug"]
             quote = span.get("quote", "").strip()
             if quote and len(technique_examples[slug]) < 10:
                 technique_examples[slug].append(quote[:300])
 
+    # Split: 25 train, 25 validation; eval50 = all 50 for benchmarking
+    random.seed(42)
+    shuffled = all_articles.copy()
+    random.shuffle(shuffled)
+    train, validation = shuffled[:25], shuffled[25:]
+
     result = {
         "splits": {
-            "train": SAMPLE_ARTICLES[:2],
-            "validation": SAMPLE_ARTICLES[2:4],
-            "test": [],
+            "train": train,
+            "validation": validation,
+            "eval50": all_articles,  # Full 50 items for benchmarking
         },
         "techniqueExamples": technique_examples,
         "_meta": {
-            "source": "PRTA (ACL 2020) Table 1 sample articles",
-            "note": "For full SemEval data, obtain from propaganda.qcri.org or use older datasets lib",
+            "source": "PRTA + curated SemEval-style + propaganda literature",
+            "totalArticles": 50,
+            "sources": ["semeval-prta", "curated-semeval", "curated-propaganda"],
+            "note": "50-item eval set for MediaGuard agent benchmarking",
         },
     }
 
@@ -96,9 +194,16 @@ def main():
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, ensure_ascii=False)
 
-    print(f"Exported sample to {output_path}")
-    print(f"  train: {len(result['splits']['train'])} articles")
-    print(f"  validation: {len(result['splits']['validation'])} articles")
+    gold_count = sum(len(a["spans"]) for a in all_articles)
+    print(f"Exported 50 articles ({gold_count} gold spans) to {output_path}")
+    print(f"  train: {len(train)} articles")
+    print(f"  validation: {len(validation)} articles")
+    by_source = {}
+    for a in all_articles:
+        src = a.get("source", "unknown")
+        by_source[src] = by_source.get(src, 0) + 1
+    print(f"  by source: {by_source}")
+
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,5 @@
 import { ElevenLabsClient } from "./elevenlabs-client.js";
+import { MistralClient } from "./mistral-client.js";
 
 const WEIGHTS_URL =
   "https://huggingface.co/efficient-nlp/stt-1b-en_fr-quantized/resolve/main/model-q4k.gguf";
@@ -24,7 +25,7 @@ let sessionStartTime = 0;
 let transcriptWords = [];
 let transcriptSegments = [];
 let transcriptStartTime = 0;
-let elevenlabsClient = null;
+let cloudClient = null; // ElevenLabsClient or MistralClient
 let analyzeTriggered = false; // Auto-analyze only once after 1 min
 
 // Diagnostics
@@ -53,13 +54,13 @@ function updateDiagnostics() {
   const audioDuration = (1024 / 24000) * diagChunksSent;
   out.textContent = [
     `Audio stream: ${diagStreamAudioTracks} track(s)${diagStreamAudioTracks === 0 ? " ⚠️ NO AUDIO!" : ""}`,
-    `Chunks sent to ElevenLabs: ${diagChunksSent} (~${chunksPerSec}/s, ~${audioDuration.toFixed(1)}s of audio)`,
-    `ElevenLabs events: ${diagPartialCount} partial, ${diagCommittedCount} committed`,
+    `Chunks sent to cloud: ${diagChunksSent} (~${chunksPerSec}/s, ~${audioDuration.toFixed(1)}s of audio)`,
+    `Cloud events: ${diagPartialCount} partial, ${diagCommittedCount} committed`,
     `Transcript duration: ${getTranscriptDuration().toFixed(1)}s`,
     ``,
     diagStreamAudioTracks === 0 ? "→ For Tab: ensure 'Share tab audio' is checked in the picker." : "",
     diagChunksSent === 0 && isRecording ? "→ No chunks sent. Check audio stream." : "",
-    diagCommittedCount === 0 && diagChunksSent > 100 ? "→ Audio sent but no transcript. Silence or ElevenLabs issue?" : "",
+    diagCommittedCount === 0 && diagChunksSent > 100 ? "→ Audio sent but no transcript. Silence or cloud STT issue?" : "",
   ].filter(Boolean).join("\n");
   el.hidden = !isRecording;
 }
@@ -122,6 +123,7 @@ async function triggerAnalyze() {
         video_id: videoId,
         transcript,
         mistral_api_key: mistralKey,
+        transcript_source: getProvider() === "mistral" ? "mistral" : getProvider() === "elevenlabs" ? "elevenlabs" : "local",
       }),
     });
 
@@ -197,9 +199,9 @@ async function startAudio() {
       const resampled = inputRate === 24000 ? chunk : resampleTo24k(chunk, inputRate);
       moshiWorker.postMessage({ command: "process_audio", audioData: resampled }, [resampled.buffer]);
     } else {
-      if (elevenlabsClient) {
+      if (cloudClient) {
         const toSend = inputRate === 24000 ? chunk : resampleTo24k(chunk, inputRate);
-        elevenlabsClient.sendAudio(toSend);
+        cloudClient.sendAudio(toSend);
         diagChunksSent++;
       }
       audioChunksProcessed++;
@@ -296,28 +298,57 @@ async function startRecording() {
 
     if (getProvider() === "elevenlabs") {
       const elevenlabsKey = (document.getElementById("elevenlabs-key")?.value || "").trim();
-      elevenlabsClient = new ElevenLabsClient({
+      cloudClient = new ElevenLabsClient({
         apiUrl: getApiUrl(),
         elevenlabsApiKey: elevenlabsKey || undefined,
       });
-      elevenlabsClient.onStatus = setStatus;
-      elevenlabsClient.onTranscript = (ev) => {
+      cloudClient.onStatus = setStatus;
+      cloudClient.onTranscript = (ev) => {
         if (ev.type === "partial") diagPartialCount++;
         if (ev.type === "committed") diagCommittedCount++;
-        transcriptWords = elevenlabsClient.getTranscript().split(/\s+/).filter(Boolean);
-        transcriptSegments = elevenlabsClient.getSegments();
+        transcriptWords = cloudClient.getTranscript().split(/\s+/).filter(Boolean);
+        transcriptSegments = cloudClient.getSegments();
         const partial = ev.type === "partial" && ev.text ? " " + ev.text : "";
         transcriptEl.textContent = (transcriptWords.join(" ") + partial).trim();
         transcriptEl.style.whiteSpace = "pre-wrap";
-        // Store transcript as it arrives; auto-analyze after at least 1 minute
         const dur = getTranscriptDuration();
-        if (ev.type === "committed" && dur >= 60 && !analyzeTriggered) {
-          triggerAnalyze();
-        } else if (ev.type === "committed" && dur > 0 && dur < 60) {
-          setStatus(`${Math.round(dur)}s transcribed. Auto-analyze at 60s…`);
-        }
+        if (ev.type === "committed" && dur >= 60 && !analyzeTriggered) triggerAnalyze();
+        else if (ev.type === "committed" && dur > 0 && dur < 60) setStatus(`${Math.round(dur)}s transcribed. Auto-analyze at 60s…`);
       };
-      await elevenlabsClient.start();
+      await cloudClient.start();
+      setStatus("Listening…");
+      diagInterval = setInterval(updateDiagnostics, 500);
+    } else if (getProvider() === "mistral") {
+      const mistralKey = (document.getElementById("mistral-key")?.value || "").trim();
+      if (!mistralKey) {
+        setStatus("Enter Mistral API key (required for Mistral provider).");
+        isRecording = false;
+        stopAudio();
+        document.querySelectorAll('input[name="provider"]').forEach((el) => (el.disabled = false));
+        document.querySelectorAll('input[name="source"]').forEach((el) => (el.disabled = false));
+        speechBtn.textContent = "Start transcription";
+        speechBtn.className = "btn-primary";
+        analyzeBtn.disabled = false;
+        return;
+      }
+      cloudClient = new MistralClient({
+        apiUrl: getApiUrl(),
+        mistralApiKey: mistralKey,
+      });
+      cloudClient.onStatus = setStatus;
+      cloudClient.onTranscript = (ev) => {
+        if (ev.type === "partial") diagPartialCount++;
+        if (ev.type === "committed") diagCommittedCount++;
+        transcriptWords = cloudClient.getTranscript().split(/\s+/).filter(Boolean);
+        transcriptSegments = cloudClient.getSegments();
+        const partial = ev.type === "partial" && ev.text ? " " + ev.text : "";
+        transcriptEl.textContent = (transcriptWords.join(" ") + partial).trim();
+        transcriptEl.style.whiteSpace = "pre-wrap";
+        const dur = getTranscriptDuration();
+        if (ev.type === "committed" && dur >= 60 && !analyzeTriggered) triggerAnalyze();
+        else if (ev.type === "committed" && dur > 0 && dur < 60) setStatus(`${Math.round(dur)}s transcribed. Auto-analyze at 60s…`);
+      };
+      await cloudClient.start();
       setStatus("Listening…");
       diagInterval = setInterval(updateDiagnostics, 500);
     } else {
@@ -342,11 +373,11 @@ function stopRecording() {
     diagInterval = null;
   }
   stopAudio();
-  if (getProvider() === "elevenlabs" && elevenlabsClient) {
-    elevenlabsClient.stop();
-    transcriptWords = elevenlabsClient.getTranscript().split(/\s+/).filter(Boolean);
-    transcriptSegments = elevenlabsClient.getSegments();
-    elevenlabsClient = null;
+  if ((getProvider() === "elevenlabs" || getProvider() === "mistral") && cloudClient) {
+    cloudClient.stop();
+    transcriptWords = cloudClient.getTranscript().split(/\s+/).filter(Boolean);
+    transcriptSegments = cloudClient.getSegments();
+    cloudClient = null;
   } else {
     moshiWorker.postMessage({ command: "stop_stream" });
     const duration = audioChunksProcessed * CHUNK_DURATION_SEC;
@@ -360,7 +391,7 @@ function stopRecording() {
   speechBtn.textContent = "Start transcription";
   speechBtn.className = "btn-primary";
   analyzeBtn.disabled = false;
-  const duration = getProvider() === "elevenlabs"
+  const duration = getProvider() === "elevenlabs" || getProvider() === "mistral"
     ? (transcriptSegments.length ? transcriptSegments[transcriptSegments.length - 1].end : 0)
     : audioChunksProcessed * CHUNK_DURATION_SEC;
   setStatus(`Stopped. ${(duration).toFixed(1)}s transcribed. Click Analyze to send to MediaGuard.`);
@@ -421,6 +452,7 @@ analyzeBtn.addEventListener("click", async () => {
         video_id: getVideoId(),
         transcript,
         mistral_api_key: mistralKey,
+        transcript_source: getProvider() === "mistral" ? "mistral" : getProvider() === "elevenlabs" ? "elevenlabs" : "local",
       }),
     });
 

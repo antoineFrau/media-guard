@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { prisma } from "../index.js";
 import { analyzeTranscript } from "../lib/mistral.js";
+import { traceAnalysis } from "../lib/langfuse.js";
 import type { TranscriptSegment } from "../lib/types.js";
 
 export const analyzeRoutes = new Hono();
@@ -10,6 +11,7 @@ analyzeRoutes.post("/", async (c) => {
     video_id: string;
     transcript: TranscriptSegment[];
     mistral_api_key?: string;
+    transcript_source?: string;
   };
 
   try {
@@ -21,7 +23,7 @@ analyzeRoutes.post("/", async (c) => {
     );
   }
 
-  const { video_id, transcript, mistral_api_key } = body;
+  const { video_id, transcript, mistral_api_key, transcript_source } = body;
 
   if (!video_id || !transcript || !Array.isArray(transcript)) {
     return c.json(
@@ -38,12 +40,18 @@ analyzeRoutes.post("/", async (c) => {
     );
   }
 
-  const analysis = await analyzeTranscript(transcript, apiKey);
+  const analysis = await traceAnalysis(video_id, transcript, (trace) =>
+    analyzeTranscript(transcript, apiKey, trace)
+  );
   if (!analysis) {
     return c.json({ reason: "analysis_failed" }, 500);
   }
 
   const hash = transcript.map((t) => t.text).join("").slice(0, 64);
+
+  const source =
+    transcript_source === "mistral" ? "mistral" :
+    transcript_source === "local" ? "local" : "elevenlabs";
 
   await prisma.$transaction(async (tx) => {
     await tx.annotation.deleteMany({ where: { videoId: video_id } });
@@ -53,14 +61,14 @@ analyzeRoutes.post("/", async (c) => {
         videoId: video_id,
         transcriptHash: hash,
         transcript: transcript as object,
-        transcriptSource: "elevenlabs",
+        transcriptSource: source,
         alerts: analysis.alerts,
         factChecks: analysis.fact_checks,
       },
       update: {
         transcriptHash: hash,
         transcript: transcript as object,
-        transcriptSource: "elevenlabs",
+        transcriptSource: source,
         alerts: analysis.alerts,
         factChecks: analysis.fact_checks,
       },
@@ -99,7 +107,7 @@ analyzeRoutes.post("/", async (c) => {
   return c.json({
     video_id: video_id,
     transcript_stored: true,
-    transcript_source: "elevenlabs",
+    transcript_source: source,
     alerts: analysis.alerts,
     fact_checks: analysis.fact_checks,
   });

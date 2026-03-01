@@ -1,14 +1,15 @@
 const storage = typeof browser !== 'undefined' ? browser.storage : chrome.storage;
 const runtime = typeof browser !== 'undefined' ? browser.runtime : chrome.runtime;
-const STORAGE_KEYS = { mistralKey: 'mistral_api_key', apiBaseUrl: 'api_base_url', elevenlabsKey: 'elevenlabs_api_key' };
+const STORAGE_KEYS = { mistralKey: 'mistral_api_key', apiBaseUrl: 'api_base_url', elevenlabsKey: 'elevenlabs_api_key', sttProvider: 'stt_provider' };
 const DEFAULT_API_URL = 'http://localhost:3000';
 
 async function getApiConfig() {
-  const data = await storage.local.get([STORAGE_KEYS.mistralKey, STORAGE_KEYS.apiBaseUrl, STORAGE_KEYS.elevenlabsKey]);
+  const data = await storage.local.get([STORAGE_KEYS.mistralKey, STORAGE_KEYS.apiBaseUrl, STORAGE_KEYS.elevenlabsKey, STORAGE_KEYS.sttProvider]);
   return {
     mistralKey: data[STORAGE_KEYS.mistralKey] || '',
     apiBaseUrl: (data[STORAGE_KEYS.apiBaseUrl] || '').replace(/\/$/, '') || DEFAULT_API_URL,
-    elevenlabsKey: data[STORAGE_KEYS.elevenlabsKey] || ''
+    elevenlabsKey: data[STORAGE_KEYS.elevenlabsKey] || '',
+    sttProvider: data[STORAGE_KEYS.sttProvider] || 'elevenlabs'
   };
 }
 
@@ -74,6 +75,23 @@ async function handleMessage(message) {
           user_comment: userComment,
           current_content: currentContent || ''
         })
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        return { error: body.reason || body.message || `HTTP ${res.status}`, status: res.status };
+      }
+      return await res.json();
+    }
+    case 'submitVote': {
+      const { annotationId, vote } = message;
+      if (!annotationId || !vote || (vote !== 'up' && vote !== 'down')) {
+        return { error: 'Missing or invalid: annotationId, vote (up|down)' };
+      }
+      const url = `${apiBaseUrl}/annotations/${annotationId}/vote`;
+      const res = await fetchWithConfig(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vote })
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));

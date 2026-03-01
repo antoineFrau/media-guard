@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { prisma } from "../index.js";
 import { fetchTranscript } from "../lib/youtube-transcript.js";
 import { analyzeTranscript } from "../lib/mistral.js";
+import { traceAnalysis } from "../lib/langfuse.js";
 
 export const videoRoutes = new Hono();
 
@@ -51,7 +52,9 @@ videoRoutes.get("/:videoId/analysis", async (c) => {
   }
 
   console.log(`[MediaGuard API] Analyzing ${videoId} with Mistral...`);
-  const analysis = await analyzeTranscript(transcript, apiKey);
+  const analysis = await traceAnalysis(videoId, transcript, (trace) =>
+    analyzeTranscript(transcript, apiKey, trace)
+  );
   if (!analysis) {
     console.log(`[MediaGuard API] Mistral analysis failed for ${videoId}`);
     return c.json({ reason: "analysis_failed" }, 500);

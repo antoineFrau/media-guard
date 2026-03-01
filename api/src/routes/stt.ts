@@ -1,6 +1,61 @@
 import { Hono } from "hono";
+import { RealtimeTranscription, AudioEncoding } from "@mistralai/mistralai/extra/realtime/index.js";
+
+const MISTRAL_MODEL = "voxtral-mini-transcribe-realtime-2602";
 
 export const sttRoutes = new Hono();
+
+async function* createAudioStream(
+  getNext: () => Promise<{ data: string } | null>
+): AsyncGenerator<Uint8Array, void, unknown> {
+  while (true) {
+    const msg = await getNext();
+    if (!msg) break;
+    const bytes = Buffer.from(msg.data, "base64");
+    yield new Uint8Array(bytes);
+  }
+}
+
+export async function runMistralTranscription(
+  apiKey: string,
+  audioQueue: { getNext: () => Promise<{ data: string } | null> },
+  sendToClient: (obj: object) => void
+) {
+  const client = new RealtimeTranscription({ apiKey });
+  const audioStream = createAudioStream(audioQueue.getNext);
+  try {
+    for await (const event of client.transcribeStream(audioStream, MISTRAL_MODEL, {
+      serverUrl: "wss://api.mistral.ai",
+      audioFormat: {
+        encoding: AudioEncoding.PcmS16le,
+        sampleRate: 16000,
+      },
+    })) {
+      if (event.type === "transcription.text.delta" && "text" in event) {
+        sendToClient({ type: "partial", text: event.text });
+      } else if (event.type === "transcription.segment" && "text" in event) {
+        const seg = event as { text: string; start: number; end: number };
+        sendToClient({
+          type: "committed",
+          text: seg.text,
+          start: seg.start ?? 0,
+          end: seg.end ?? 0,
+          words: [{ text: seg.text, start: seg.start, end: seg.end }],
+        });
+      } else if (event.type === "transcription.done") {
+        sendToClient({ type: "done" });
+      } else if (event.type === "error" && "error" in event) {
+        const err = event.error as { message?: string };
+        sendToClient({ type: "error", error: err?.message ?? "Transcription error" });
+      }
+    }
+  } catch (err) {
+    sendToClient({
+      type: "error",
+      error: err instanceof Error ? err.message : "Unknown error",
+    });
+  }
+}
 
 async function fetchElevenLabsToken(apiKey: string) {
   const res = await fetch(

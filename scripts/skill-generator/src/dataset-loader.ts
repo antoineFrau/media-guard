@@ -42,6 +42,7 @@ export interface SemEvalExport {
     validation?: SemEvalArticle[];
     val?: SemEvalArticle[];
     test?: SemEvalArticle[];
+    eval50?: SemEvalArticle[];
   };
   techniqueExamples?: Record<string, string[]>;
 }
@@ -151,14 +152,22 @@ export async function loadTechniqueDefinitions(
 
 /**
  * Load evaluation samples (articles with gold spans) for a given split.
+ * Use split="eval50" for the full 50-item benchmark set.
  */
-export async function loadEvalSamples(split: "train" | "validation" | "test" = "validation"): Promise<SemEvalArticle[]> {
+export async function loadEvalSamples(
+  split: "train" | "validation" | "test" | "eval50" = "validation"
+): Promise<SemEvalArticle[]> {
   const semeval = await loadSemEvalExport();
   if (!semeval) {
     throw new Error("Run: python scripts/export-semeval.py to export SemEval data first");
   }
 
-  const splitKey = split === "validation" ? "validation" in semeval.splits ? "validation" : "val" : split;
-  const articles = semeval.splits[splitKey] ?? semeval.splits.train ?? [];
+  const splitKey =
+    split === "validation"
+      ? "validation" in semeval.splits
+        ? "validation"
+        : "val"
+      : split;
+  const articles = semeval.splits[splitKey as keyof typeof semeval.splits] ?? semeval.splits.train ?? [];
   return articles;
 }

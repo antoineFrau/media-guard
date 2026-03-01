@@ -73,7 +73,7 @@ commentRoutes.post("/improve", async (c) => {
     data: {
       annotationId: annotation_id,
       userContent: user_comment,
-      mistralImprovedContent: improved,
+      mistralImprovedContent: improved as object,
       status: "APPLIED",
     },
   });
