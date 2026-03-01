@@ -23,7 +23,8 @@
     "skill:benchmark:sync": "cd scripts/skill-generator && tsx src/sync-dataset.ts",
     "web:dev": "cd web && npm run dev",
     "web:build": "cd web && npm run build",
-    "web:preview": "cd web && npm run preview"
+    "web:preview": "cd web && npm run preview",
+    "extension:build": "./scripts/build-extension.sh"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
