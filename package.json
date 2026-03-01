@@ -20,7 +20,10 @@
     "skill:generate:datasets": "cd scripts/skill-generator && tsx src/generate-from-datasets.ts",
     "skill:evaluate": "cd scripts/skill-generator && tsx src/evaluate.ts",
     "skill:benchmark": "cd scripts/skill-generator && tsx src/benchmark.ts",
-    "skill:benchmark:sync": "cd scripts/skill-generator && tsx src/sync-dataset.ts"
+    "skill:benchmark:sync": "cd scripts/skill-generator && tsx src/sync-dataset.ts",
+    "web:dev": "cd web && npm run dev",
+    "web:build": "cd web && npm run build",
+    "web:preview": "cd web && npm run preview"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

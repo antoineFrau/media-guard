@@ -1,0 +1,37 @@
+---
+const features = [
+	{
+		title: 'Non-intrusive UX',
+		desc: 'SponsorBlock-style segment markers on the timeline plus a contextual overlay when playback enters a manipulation segment.',
+		icon: 'timeline',
+	},
+	{
+		title: 'Crowdsourced improvement',
+		desc: 'Add context to segments; Mistral augments annotations for future viewers.',
+		icon: 'crowd',
+	},
+	{
+		title: 'Privacy-conscious',
+		desc: 'BYOK — Bring Your Own Key. Your Mistral API key never leaves your device.',
+		icon: 'lock',
+	},
+	{
+		title: '14 techniques',
+		desc: 'Academic taxonomy from PRTA, SemEval-2020 Task 11, and PropaInsight (COLING 2025). Vote on annotations.',
+		icon: 'taxonomy',
+	},
+];
+---
+
+<section id="features" class="mx-auto max-w-6xl rounded-2xl bg-bg-elevated px-6 py-12">
+	<h2 class="mb-10 text-center text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-text">Features</h2>
+	<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+		{features.map((f) => (
+			<div class="rounded-xl border border-white/[0.06] bg-bg p-5">
+				<div class="mb-3 text-2xl opacity-90" aria-hidden="true">{f.icon === 'timeline' ? '▬' : f.icon === 'crowd' ? '⊕' : f.icon === 'lock' ? '●' : '◇'}</div>
+				<h3 class="mb-2 text-base font-semibold text-text">{f.title}</h3>
+				<p class="m-0 text-sm text-text-muted">{f.desc}</p>
+			</div>
+		))}
+	</div>
+</section>

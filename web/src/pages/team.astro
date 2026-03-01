@@ -1,0 +1,50 @@
+---
+import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const team = [
+	{
+		name: 'Antoine',
+		role: 'Developer',
+		links: [
+			{ label: 'LinkedIn', url: 'https://www.linkedin.com/in/antoine-frau/' },
+			{ label: 'GitHub', url: 'https://github.com/antoineFrau' },
+		],
+	},
+	{
+		name: 'Cursor',
+		role: 'AI pair programmer',
+		links: [
+			{ label: 'cursor.com', url: 'https://cursor.com' },
+		],
+	},
+];
+---
+
+<Layout title="Team — MediaGuard" description="The people and tools behind MediaGuard.">
+	<Header />
+	<main class="min-h-[60vh] px-6 py-16">
+		<div class="mx-auto max-w-3xl">
+			<h1 class="mb-2 text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-text">Team</h1>
+			<p class="mb-10 text-[1.0625rem] text-text-muted">MediaGuard was built with human creativity and AI assistance.</p>
+			<div class="grid gap-6 sm:grid-cols-2">
+				{team.map((member) => (
+					<div class="rounded-xl border border-white/10 bg-bg-elevated p-6">
+						<div class="mb-4">
+							<h2 class="mb-1 text-xl font-semibold text-text">{member.name}</h2>
+							<span class="text-sm text-text-muted">{member.role}</span>
+						</div>
+						<div class="flex flex-wrap gap-3">
+							{member.links.map((link) => (
+								<a href={link.url} target="_blank" rel="noopener noreferrer" class="text-[0.9375rem]">{link.label}</a>
+							))}
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
+	</main>
+	<Footer />
+</Layout>

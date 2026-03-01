@@ -1,0 +1,28 @@
+---
+import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Features from '../components/Features.astro';
+import Techniques from '../components/Techniques.astro';
+import Research from '../components/Research.astro';
+import FallbackCommunity from '../components/FallbackCommunity.astro';
+import Install from '../components/Install.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout>
+	<Header />
+	<!-- Add videoId="YOUR_YOUTUBE_ID" to Hero when the hackathon video is ready -->
+	<Hero />
+	<main class="space-y-16">
+		<HowItWorks />
+		<Features />
+		<Techniques />
+		<Research />
+		<FallbackCommunity />
+		<Install />
+	</main>
+	<Footer />
+</Layout>

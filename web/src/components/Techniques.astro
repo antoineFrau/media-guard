@@ -1,0 +1,43 @@
+---
+const techniques = [
+	{
+		name: 'Appeal to Authority',
+		definition: 'Using experts, institutions, or credible-seeming persons to lend weight to a claim.',
+		quote: '"Dr. Smith, a renowned epidemiologist from Harvard, stated that the vaccine is completely safe."',
+	},
+	{
+		name: 'Loaded Language',
+		definition: 'Using words with strong emotional connotations to influence perception. Slanted vocabulary that triggers emotional responses.',
+		quote: '"The brutal regime cracked down on protesters."',
+	},
+	{
+		name: 'Appeal to Fear/Prejudice',
+		definition: 'Using fear, prejudice, or other strong emotions to influence the audience. Includes dramatic descriptions, catastrophic scenarios, or implicit threats.',
+		quote: '"If we don\'t act now, economic collapse is imminent. Millions will lose their jobs."',
+	},
+	{
+		name: 'Black-and-White Fallacy',
+		definition: 'Presenting two alternatives as the only possibilities when more options exist. False dilemma or false binary.',
+		quote: '"You are either with us or against us. There is no middle ground."',
+	},
+	{
+		name: 'Bandwagon, Reductio ad Hitlerum',
+		definition: 'Bandwagon: suggesting everyone supports a position. Reductio: comparing something to Hitler or Nazism to discredit it.',
+		quote: '"Polls show 90% of Americans support this policy. Join the majority."',
+	},
+];
+---
+
+<section id="techniques" class="mx-auto max-w-6xl px-6 py-16">
+	<h2 class="mb-4 text-center text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-text">Techniques we detect</h2>
+	<p class="mx-auto mb-8 max-w-[36rem] text-center text-[0.9375rem] text-text-muted">MediaGuard identifies 14 rhetorical manipulation techniques. Here's what the floating panel shows when you hover or play into a segment:</p>
+	<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+		{techniques.map((t) => (
+			<div class="rounded-xl border border-l-4 border-l-manipulation border-white/[0.06] bg-bg-elevated p-5">
+				<h3 class="mb-2 text-base font-semibold text-text">{t.name}</h3>
+				<p class="mb-3 text-[0.8125rem] text-text-muted">{t.definition}</p>
+				<blockquote class="m-0 border-l-2 border-accent pl-3 text-[0.8125rem] italic text-text-muted">{t.quote}</blockquote>
+			</div>
+		))}
+	</div>
+</section>

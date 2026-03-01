@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+	/* MediaGuard palette */
+	--color-bg: #0f172a;
+	--color-bg-elevated: #1e293b;
+	--color-text: #f8fafc;
+	--color-text-muted: #94a3b8;
+	--color-accent: #f59e0b;
+	--color-accent-hover: #fbbf24;
+	--color-manipulation: #ea580c;
+	--color-factcheck: #2563eb;
+	--font-sans: 'DM Sans', system-ui, sans-serif;
+	--font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+	a {
+		@apply text-accent no-underline transition-colors duration-200;
+	}
+	a:hover {
+		@apply text-accent-hover;
+	}
+}
+
+@layer components {
+	.btn-primary {
+		@apply inline-flex cursor-pointer items-center justify-center rounded-lg bg-accent px-6 py-3 font-semibold text-bg transition-all duration-200 hover:bg-accent-hover;
+	}
+}

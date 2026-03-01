@@ -1,0 +1,120 @@
+---
+import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Documentation — MediaGuard" description="Methodology, skill generation, and research behind MediaGuard.">
+	<Header />
+	<main class="px-6 py-8 pb-16">
+		<article class="mx-auto max-w-3xl">
+			<h1 class="mb-2 text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-text">Documentation</h1>
+			<p class="mb-10 text-[1.0625rem] text-text-muted">Read more about the methodology, where the skills are generated from, and the research foundations of MediaGuard.</p>
+
+			<section>
+				<h2 class="mb-4 mt-10 border-b border-white/[0.12] pb-2 text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-text">Methodology</h2>
+				<p class="mb-4 text-text-muted">MediaGuard is an LLM-based system for detecting rhetorical manipulation techniques in video transcripts and news text. It uses large language models (Mistral) to identify manipulation techniques, guided by skill definitions that encode technique taxonomies and recognition criteria.</p>
+				<h3 class="mb-2 mt-6 text-base font-semibold text-text">Evaluation protocol</h3>
+				<ul class="my-4 list-inside list-disc space-y-2 pl-4 text-[0.9375rem] text-text-muted">
+					<li><strong class="text-text">Input:</strong> Article text converted to pseudo-transcript format (sentence-level segments with timestamps).</li>
+					<li><strong class="text-text">Analysis:</strong> Mistral API (<code class="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-[0.875em]">mistral-small-latest</code>) with skills context; returns JSON alerts with <code class="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-[0.875em]">technique</code>, <code class="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-[0.875em]">quote</code>, <code class="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-[0.875em]">start</code>, <code class="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-[0.875em]">end</code>.</li>
+					<li><strong class="text-text">Span-based metrics:</strong> Gold span matches prediction if the predicted quote overlaps the gold span (character-level) and the predicted technique maps to the same gold technique.</li>
+					<li><strong class="text-text">LLM-as-judge:</strong> Mistral receives text, gold spans, and predicted alerts, then returns a score 0–1 indicating how well predictions match gold.</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2 class="mb-4 mt-10 border-b border-white/[0.12] pb-2 text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-text">Where skills are generated from</h2>
+				<p class="mb-4 text-text-muted">MediaGuard uses a <strong class="text-text">multi-source skill generation</strong> approach. Skills are built from the following sources:</p>
+
+				<h3 class="mb-2 mt-6 text-base font-semibold text-text">1. PRTA (ACL 2020)</h3>
+				<p class="mb-4 text-text-muted">Base definitions from the <a href="https://aclanthology.org/2020.acl-demos.32/" target="_blank" rel="noopener">PRTA paper</a> — A System to Support the Analysis of Propaganda Techniques in the News. Provides the Tanbih framework and core technique definitions.</p>
+
+				<h3 class="mb-2 mt-6 text-base font-semibold text-text">2. SemEval-2020 Task 11</h3>
+				<p class="mb-4 text-text-muted">The <a href="https://aclanthology.org/2020.semeval-1.186/" target="_blank" rel="noopener">SemEval-2020 Task 11</a> taxonomy defines 14 manipulation techniques (e.g., appeal-to-authority, loaded-language, appeal-to-fear-prejudice) with span identification. Our technique slugs align with this taxonomy.</p>
+
+				<h3 class="mb-2 mt-6 text-base font-semibold text-text">3. PropaInsight (COLING 2025)</h3>
+				<p class="mb-4 text-text-muted"><a href="https://aclanthology.org/2025.coling-main.376/" target="_blank" rel="noopener">PropaInsight</a> enriches each technique with:</p>
+				<ul class="my-4 list-inside list-disc space-y-2 pl-4 text-[0.9375rem] text-text-muted">
+					<li><strong class="text-text">Appeals</strong> — Emotional/arousal evoked in readers (e.g., fear, credibility, belonging)</li>
+					<li><strong class="text-text">Intent</strong> — Author motive (e.g., persuade, discredit, create urgency)</li>
+					<li><strong class="text-text">Common confusions</strong> — Distinguishing cues (e.g., legitimate skepticism vs manufactured doubt)</li>
+				</ul>
+
+				<h3 class="mb-2 mt-6 text-base font-semibold text-text">4. Merged definitions</h3>
+				<p class="mb-4 text-text-muted">The skill generator combines:</p>
+				<ul class="my-4 list-inside list-disc space-y-2 pl-4 text-[0.9375rem] text-text-muted">
+					<li><code class="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-[0.875em]">data/technique-definitions-static.json</code> — PRTA + SemEval base definitions</li>
+					<li><code class="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-[0.875em]">data/semeval-export.json</code> — Curated technique examples from the 50-item evaluation set</li>
+					<li><code class="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-[0.875em]">data/propainsight-supplement.json</code> — Appeals, intent, and confusions per technique</li>
+				</ul>
+				<p class="mb-4 text-text-muted">Output: <code class="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-[0.875em]">output/technique-definitions.json</code> and <code class="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-[0.875em]">{"output/skills-dataset/{slug}/SKILL.md"}</code> for each of the 14 techniques.</p>
+			</section>
+
+			<section>
+				<h2 class="mb-4 mt-10 border-b border-white/[0.12] pb-2 text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-text">Benchmark results</h2>
+				<p class="mb-4 text-text-muted">MediaGuard was benchmarked on a 50-item evaluation set with gold-annotated spans.</p>
+				<table class="my-4 w-full border-collapse text-[0.9375rem]">
+					<caption class="mb-2 text-left font-semibold text-text">Span-based metrics</caption>
+					<thead>
+						<tr>
+							<th class="border border-white/[0.12] bg-bg-elevated px-3 py-2 text-left font-medium text-text-muted">Agent</th>
+							<th class="border border-white/[0.12] bg-bg-elevated px-3 py-2 text-left font-medium text-text-muted">Samples</th>
+							<th class="border border-white/[0.12] bg-bg-elevated px-3 py-2 text-left font-medium text-text-muted">F1</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="border border-white/[0.12] px-3 py-2">skills-dataset (multi-source)</td>
+							<td class="border border-white/[0.12] px-3 py-2">50</td>
+							<td class="border border-white/[0.12] px-3 py-2"><strong class="text-text">64.2%</strong></td>
+						</tr>
+					</tbody>
+				</table>
+				<table class="my-4 w-full border-collapse text-[0.9375rem]">
+					<caption class="mb-2 text-left font-semibold text-text">LLM-as-judge</caption>
+					<thead>
+						<tr>
+							<th class="border border-white/[0.12] bg-bg-elevated px-3 py-2 text-left font-medium text-text-muted">Agent</th>
+							<th class="border border-white/[0.12] bg-bg-elevated px-3 py-2 text-left font-medium text-text-muted">Judge score</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="border border-white/[0.12] px-3 py-2">skills-dataset (multi-source)</td>
+							<td class="border border-white/[0.12] px-3 py-2"><strong class="text-text">70.0%</strong></td>
+						</tr>
+					</tbody>
+				</table>
+				<p class="mb-4 text-text-muted">PropaInsight enrichment improves over the single-source baseline (+6.4% F1, +8.2% judge).</p>
+			</section>
+
+			<section>
+				<h2 class="mb-4 mt-10 border-b border-white/[0.12] pb-2 text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-text">14 techniques (SemEval taxonomy)</h2>
+				<ul class="columns-2 gap-8 space-y-1 font-mono text-sm sm:columns-1">
+					<li>appeal-to-authority</li>
+					<li>appeal-to-fear-prejudice</li>
+					<li>bandwagon-reductio-ad-hitlerum</li>
+					<li>black-and-white-fallacy</li>
+					<li>causal-oversimplification</li>
+					<li>doubt</li>
+					<li>exaggeration-minimisation</li>
+					<li>flag-waving</li>
+					<li>loaded-language</li>
+					<li>name-calling-labeling</li>
+					<li>repetition</li>
+					<li>slogans</li>
+					<li>thought-terminating-cliches</li>
+					<li>whataboutism-straw-men-red-herring</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2 class="mb-4 mt-10 border-b border-white/[0.12] pb-2 text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-text">Further reading</h2>
+				<p class="text-text-muted">For the full paper-style conclusion, evaluation protocol, and per-technique performance, see the <a href="https://github.com/zenocode/media-guard/blob/main/docs/CONCLUSION.md" target="_blank" rel="noopener">CONCLUSION.md</a> in the repository.</p>
+			</section>
+		</article>
+	</main>
+	<Footer />
+</Layout>

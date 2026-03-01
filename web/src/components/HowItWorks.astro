@@ -1,0 +1,39 @@
+---
+const steps = [
+	{
+		step: 1,
+		title: 'Open any YouTube video',
+		desc: 'Navigate to any video on youtube.com.',
+	},
+	{
+		step: 2,
+		title: 'Analysis loads',
+		desc: 'MediaGuard fetches the transcript (or captures tab audio if no captions). Mistral analyzes for manipulation techniques.',
+	},
+	{
+		step: 3,
+		title: 'Segment markers appear',
+		desc: 'Colored bars on the progress bar: orange = manipulation, blue = fact-check claim.',
+	},
+	{
+		step: 4,
+		title: 'Hover or play into a segment',
+		desc: 'A floating panel shows the technique name, quoted excerpt, and explanation.',
+	},
+];
+---
+
+<section id="how-it-works" class="mx-auto max-w-6xl px-6 pt-12">
+	<h2 class="mb-10 text-center text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-text">How it works</h2>
+	<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+		{steps.map((s) => (
+			<div class="flex items-start gap-4 rounded-xl border border-white/[0.06] bg-bg-elevated p-5">
+				<span class="flex size-8 flex-shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-bg font-mono">{s.step}</span>
+				<div class="min-w-0">
+					<h3 class="mb-1 text-base font-semibold text-text">{s.title}</h3>
+					<p class="m-0 text-sm text-text-muted">{s.desc}</p>
+				</div>
+			</div>
+		))}
+	</div>
+</section>
