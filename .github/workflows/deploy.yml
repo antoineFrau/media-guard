@@ -38,7 +38,7 @@ jobs:
           cd web && npm ci && npm run build
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@3
+        uses: actions/upload-pages-artifact@v3
         with:
           path: web/dist
 
