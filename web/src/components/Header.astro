@@ -3,12 +3,12 @@ const base = import.meta.env.BASE_URL;
 ---
 
 <header class="border-b border-white/10 bg-bg px-6 py-4">
-	<nav class="mx-auto flex max-w-6xl items-center justify-between">
+	<nav class="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
 		<a href={base || '/'} class="flex items-center gap-2 text-text hover:text-accent">
 			<img src={`${base || '/'}logo.svg`} alt="" class="size-8 rounded-xl" aria-hidden />
 			<span class="text-lg font-bold">MediaGuard</span>
 		</a>
-		<div class="flex gap-6">
+		<div class="flex flex-wrap gap-6">
 			<a href={base || '/'} class="text-[0.9375rem] text-text-muted hover:text-accent">Home</a>
 			<a href={`${base}team/`} class="text-[0.9375rem] text-text-muted hover:text-accent">Team</a>
 			<a href={`${base}documentation/`} class="text-[0.9375rem] text-text-muted hover:text-accent">Documentation</a>
