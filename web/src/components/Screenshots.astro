@@ -1,0 +1,45 @@
+---
+const base = import.meta.env.BASE_URL;
+const screenshots = [
+	{
+		src: `${base}screenshots/in-video-context.png`,
+		alt: 'In-video context overlay showing manipulation techniques on YouTube',
+		title: 'In-video context',
+		desc: 'Browser Extension — Segment markers and contextual overlay when playback enters a manipulation segment.',
+	},
+	{
+		src: `${base}screenshots/list-of-insights-by-community.png`,
+		alt: 'List of insights contributed by the community',
+		title: 'Community insights',
+		desc: 'Browse and vote on crowdsourced annotations. Mistral augments annotations for future viewers.',
+	},
+	{
+		src: `${base}screenshots/recording-audio-by-user.png`,
+		alt: 'STT app recording mic or tab audio for real-time transcription',
+		title: 'Recording audio',
+		desc: 'STT App — Transcribe tab or mic audio in real time with ElevenLabs or Mistral Voxtral.',
+	},
+];
+---
+
+<section id="screenshots" class="mx-auto max-w-6xl px-6 pt-12">
+	<h2 class="mb-10 text-center text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-text">Screenshots</h2>
+	<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+		{screenshots.map((s) => (
+			<div class="overflow-hidden rounded-xl border border-white/[0.06] bg-bg-elevated">
+				<div class="aspect-video overflow-hidden bg-bg">
+					<img
+						src={s.src}
+						alt={s.alt}
+						class="size-full object-cover object-top"
+						loading="lazy"
+					/>
+				</div>
+				<div class="p-4">
+					<h3 class="mb-1 text-base font-semibold text-text">{s.title}</h3>
+					<p class="m-0 text-sm text-text-muted">{s.desc}</p>
+				</div>
+			</div>
+		))}
+	</div>
+</section>

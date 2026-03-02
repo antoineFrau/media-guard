@@ -13,6 +13,8 @@
 
 > LLM-based detection of rhetorical manipulation techniques in video transcripts and news text.
 
+**Website:** [https://antoinefrau.github.io/media-guard/](https://antoinefrau.github.io/media-guard/)
+
 ---
 
 ## Research & Papers
@@ -31,11 +33,17 @@ See [docs/CONCLUSION.md](docs/CONCLUSION.md) for full methodology, evaluation pr
 
 ## Components
 
-- **Landing Page** — Astro site in `web/` (deployed to GitHub Pages via `.github/workflows/deploy.yml`)
+- **Landing Page** — Astro site in `web/` → [https://antoinefrau.github.io/media-guard/](https://antoinefrau.github.io/media-guard/) (GitHub Pages)
 - **API** — Backend for analysis, annotations, and crowdsourced improvements
 - **Browser Extension** — YouTube video analysis and fact-check overlays (Chrome, Firefox)
 - **STT App** — Real-time speech-to-text with Mic/Tab capture
 - **Skill Generator** — Dataset-backed manipulation technique definitions (PRTA + SemEval + PropaInsight)
+
+### Screenshots
+
+| In-video context (Browser Extension) | List of insights by community | Recording audio (STT App) |
+|-------------------------------------|-------------------------------|---------------------------|
+| ![In-video context](screenshots/in-video-context.png) | ![List of insights](screenshots/list-of-insights-by-community.png) | ![Recording audio](screenshots/recording-audio-by-user.png) |
 
 ---
 
