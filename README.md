@@ -43,7 +43,7 @@ See [docs/CONCLUSION.md](docs/CONCLUSION.md) for full methodology, evaluation pr
 
 | In-video context (Browser Extension) | List of insights by community | Recording audio (STT App) |
 |-------------------------------------|-------------------------------|---------------------------|
-| ![In-video context](screenshots/in-video-context.png) | ![List of insights](screenshots/list-of-insights-by-community.png) | ![Recording audio](screenshots/recording-audio-by-user.png) |
+| ![In-video context](screenshots/in-video-context.png) | ![List of insights](screenshots/list-of-insights-by-community.png) | ![Recording audio](screenshots/recording-audio.png) |
 
 ---
 

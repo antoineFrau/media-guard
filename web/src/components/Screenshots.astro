@@ -14,7 +14,7 @@ const screenshots = [
 		desc: 'Browse and vote on crowdsourced annotations. Mistral augments annotations for future viewers.',
 	},
 	{
-		src: `${base}screenshots/recording-audio-by-user.png`,
+		src: `${base}screenshots/recording-audio.png`,
 		alt: 'STT app recording mic or tab audio for real-time transcription',
 		title: 'Recording audio',
 		desc: 'STT App — Transcribe tab or mic audio in real time with ElevenLabs or Mistral Voxtral.',
@@ -26,12 +26,18 @@ const screenshots = [
 	<h2 class="mb-10 text-center text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-text">Screenshots</h2>
 	<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
 		{screenshots.map((s) => (
-			<div class="overflow-hidden rounded-xl border border-white/[0.06] bg-bg-elevated">
+			<button
+				type="button"
+				class="group w-full cursor-pointer overflow-hidden rounded-xl border border-white/[0.06] bg-bg-elevated text-left transition-opacity hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg"
+				aria-label={`View full size: ${s.title}`}
+				data-lightbox-src={s.src}
+				data-lightbox-alt={s.alt}
+			>
 				<div class="aspect-video overflow-hidden bg-bg">
 					<img
 						src={s.src}
 						alt={s.alt}
-						class="size-full object-cover object-top"
+						class="size-full object-cover object-top transition-transform group-hover:scale-[1.02]"
 						loading="lazy"
 					/>
 				</div>
@@ -39,7 +45,57 @@ const screenshots = [
 					<h3 class="mb-1 text-base font-semibold text-text">{s.title}</h3>
 					<p class="m-0 text-sm text-text-muted">{s.desc}</p>
 				</div>
-			</div>
+			</button>
 		))}
 	</div>
 </section>
+
+<dialog id="screenshot-lightbox" class="fixed inset-0 z-50 w-full max-w-none border-0 bg-black/90 p-0 backdrop:bg-black/90 [&::backdrop]:bg-black/90" aria-label="Screenshot lightbox">
+	<div class="flex min-h-screen w-full cursor-zoom-out items-center justify-center p-4" data-lightbox-backdrop>
+		<button
+			type="button"
+			class="absolute right-4 top-4 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-accent"
+			aria-label="Close"
+			data-lightbox-close
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+		</button>
+		<img id="lightbox-image" src="" alt="" class="max-h-[90vh] max-w-[90vw] object-contain" />
+	</div>
+</dialog>
+
+<script>
+	const lightbox = document.getElementById('screenshot-lightbox') as HTMLDialogElement;
+	const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement;
+
+	document.querySelectorAll('[data-lightbox-src]').forEach((btn) => {
+		btn.addEventListener('click', () => {
+			const src = btn.getAttribute('data-lightbox-src');
+			const alt = btn.getAttribute('data-lightbox-alt');
+			if (src) {
+				lightboxImage.src = src;
+				lightboxImage.alt = alt || '';
+				lightbox.showModal();
+				document.body.style.overflow = 'hidden';
+			}
+		});
+	});
+
+	function closeLightbox() {
+		lightbox.close();
+		document.body.style.overflow = '';
+	}
+
+	lightbox.addEventListener('click', (e) => {
+		if (e.target === lightbox) closeLightbox();
+	});
+	document.querySelector('[data-lightbox-backdrop]')?.addEventListener('click', (e) => {
+		if (e.target === e.currentTarget) closeLightbox();
+	});
+	lightbox.addEventListener('close', () => { document.body.style.overflow = ''; });
+	document.querySelector('[data-lightbox-close]')?.addEventListener('click', closeLightbox);
+
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape' && lightbox?.open) closeLightbox();
+	});
+</script>
