@@ -13,7 +13,7 @@
 
 > LLM-based detection of rhetorical manipulation techniques in video transcripts and news text.
 
-**Website:** [https://antoinefrau.github.io/media-guard/](https://antoinefrau.github.io/media-guard/)
+**Website:** [https://antoinefrau.github.io/media-guard/](https://antoinefrau.github.io/media-guard/) · **Demo video:** [https://youtu.be/0X0Q5NbwcKg](https://youtu.be/0X0Q5NbwcKg)
 
 ---
 

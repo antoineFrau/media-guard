@@ -11,3 +11,4 @@ stt-app/build
 
 # Skill generator Python venv
 scripts/skill-generator/.venv/
+*.mp4
